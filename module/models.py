@@ -14,11 +14,11 @@ class ModuleManager(models.Manager):
 class Module(models.Model):
     module_name = models.CharField(max_length=256, default="")
     description = models.TextField(blank=True, null=True)
-    passingScore = models.FloatField(default=50.0)
-    quizCanRetake = models.BooleanField(default=False)
-    quizAttempt = models.IntegerField(default=1)
-    dateCreated = models.DateTimeField(auto_now_add=True)
-    dateUpdated = models.DateTimeField(auto_now=True)
+    passing_score = models.FloatField(default=50.0)
+    quiz_can_retake = models.BooleanField(default=False)
+    quiz_attempt = models.IntegerField(default=1)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
 
 
 class ScenarioManager(models.Manager):
@@ -29,9 +29,9 @@ class Scenario(models.Model):
     module_id = models.ForeignKey(Module, on_delete=models.PROTECT)
     user_id = models.ManyToManyField(User)
     description = models.TextField(blank=True, null=True)
-    coverImage = models.ImageField(upload_to='upload/scenario')
-    highRise = models.BooleanField(default=False)
+    cover_image = models.ImageField(upload_to='upload/scenario')
+    high_rise = models.BooleanField(default=False)
     level = models.CharField(choices=LEVEL, max_length=256, default='Easy')
-    defaultConfig = models.TextField(default=json.dumps({}))
-    dateCreated = models.DateTimeField(auto_now_add=True)
-    dateUpdated = models.DateTimeField(auto_now=True)
+    default_config = models.TextField(default=json.dumps({}))
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
