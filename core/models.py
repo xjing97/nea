@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractUser
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, username, date_of_birth, department, soeId, password=None):
+    def create_user(self, username, date_of_birth, department, soeId, profile_pic, password):
         """
         Creates and saves a User with the given username, date of birth, department, soeId and password.
         """
@@ -19,6 +19,7 @@ class UserManager(BaseUserManager):
             date_of_birth=date_of_birth,
             department=department,
             soeId=soeId,
+            profile_pic=profile_pic
         )
 
         user.set_password(password)
@@ -42,7 +43,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    profile_pic = models.ImageField(upload_to='profile-pic', default=None)
+    profile_pic = models.ImageField(upload_to='upload/profile-pic', default=None)
     soeId = models.CharField(max_length=50, blank=True)
     department = models.CharField(max_length=100, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
