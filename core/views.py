@@ -53,6 +53,31 @@ def login(request):
     return res
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getUser(request):
+    user_id = request.data['user_id']
+    user = User.objects.filter(id=user_id).first()
+    if user:
+        res = Response(data={'data': {'user_id': user.id,
+                                      'username': user.username,
+                                      'date_of_birth': user.date_of_birth,
+                                      'department': user.department,
+                                      'soeId': user.soeId,
+                                      }})
+    else:
+        res = Response(status=400, data={'error_message': 'User not found'})
+    return res
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getAllUsers(request):
+    user = User.objects.values('user_id', 'username', 'date_of_birth', 'department', 'soeId')
+
+    return Response(data={'data': list(user)})
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def editUser(request):
