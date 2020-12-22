@@ -3,7 +3,7 @@ from django.db import transaction
 from django.http import JsonResponse
 from rest_framework import serializers
 from typing import MutableMapping
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 from core.models import User
 
@@ -47,7 +47,7 @@ class LoginSerializer(serializers.Serializer):
         token = RefreshToken.for_user(user)
 
         data = {'refresh_token': str(token), 'access_token': str(token.access_token), 'user_id': user.id,
-                'user_name': user.username}
+                'user_name': user.username, 'expires_at': AccessToken.lifetime}
         return JsonResponse(data={'data': data, 'message': 'Login successfully'})
 
 

@@ -1,5 +1,7 @@
 from django.http import JsonResponse
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+
 from nea.decorators import permission_exempt, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from .models import User
@@ -53,6 +55,19 @@ def login(request):
     return res
 
 
+@api_view(['POST'])
+@permission_exempt
+def renewToken(request):
+    print(request.data)
+    user = request.user
+    refresh_token = request.data['refreshToken']
+    token = RefreshToken(refresh_token)
+
+    data = {'refresh_token': str(token), 'access_token': str(token.access_token), 'user_id': user.id,
+            'user_name': user.username, 'expires_at': AccessToken.lifetime}
+    return Response(data={'data': data})
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getUser(request):
@@ -73,8 +88,7 @@ def getUser(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getAllUsers(request):
-    user = User.objects.values('user_id', 'username', 'date_of_birth', 'department', 'soeId')
-
+    user = User.objects.filter(is_staff=False, is_active=True).values('id', 'username', 'date_of_birth', 'department', 'soeId')
     return Response(data={'data': list(user)})
 
 
