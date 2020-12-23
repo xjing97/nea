@@ -71,7 +71,7 @@ def renewToken(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getUser(request):
-    user_id = request.data['user_id']
+    user_id = request.GET.get('user_id')
     user = User.objects.filter(id=user_id).first()
     if user:
         res = Response(data={'data': {'user_id': user.id,
@@ -89,7 +89,7 @@ def getUser(request):
 @permission_classes([IsAuthenticated])
 def getAllUsers(request):
     user = User.objects.filter(is_staff=False, is_active=True).values('id', 'username', 'date_of_birth', 'department', 'soeId')
-    return Response(data={'data': list(user)})
+    return Response(data={'data': list(user), 'message': 'Get all users successfully'})
 
 
 @api_view(['POST'])
