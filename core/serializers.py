@@ -57,7 +57,7 @@ class UserSerializer(serializers.Serializer):
     date_of_birth = serializers.DateField(required=True)
     soeId = serializers.CharField(max_length=256, required=True)
     department = serializers.CharField(max_length=256, required=True)
-    password = serializers.CharField(max_length=256, required=True)
+    # password = serializers.CharField(max_length=256, required=True)
 
     def validate(self, data: MutableMapping[str, str]):
         user_id = data.get('user_id')
@@ -67,7 +67,7 @@ class UserSerializer(serializers.Serializer):
 
         return data
 
-    def update(self, instance, validated_data):
+    def update(self):
         user_id = self.validated_data['user_id']
         user = User.objects.filter(id=user_id).first()
         with transaction.atomic():
@@ -76,10 +76,12 @@ class UserSerializer(serializers.Serializer):
                 user.date_of_birth = self.validated_data['date_of_birth']
                 user.soeId = self.validated_data['soeId']
                 user.department = self.validated_data['department']
-                user.password = self.validated_data['password']
+                # user.password = self.validated_data['password']
                 user.save()
 
-                return JsonResponse(data={'data': {'user_id': user.id}, 'message': "Updated user successfully"})
+                return JsonResponse(data={'data': {'user_id': user.id, 'username': user.username, 'soeId': user.soeId,
+                                                   'department': user.department, 'date_of_birth': user.date_of_birth},
+                                          'message': "Updated user successfully"})
 
             else:
                 return JsonResponse(status_code='400', data={'data': {'user_id': user.id}, 'message': "User not found"})
