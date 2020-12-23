@@ -34,6 +34,7 @@ class SignUpSerializer(serializers.Serializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=256, required=True)
     password = serializers.CharField(max_length=256, required=True)
+    mac_id = serializers.CharField(max_length=256, required=False)
 
     def validate(self, data: MutableMapping[str, str]):
         user = authenticate(**data)
@@ -44,6 +45,14 @@ class LoginSerializer(serializers.Serializer):
 
     def login(self):
         user = authenticate(**self.validated_data)
+        if 'mac_id' in self.validated_data:
+            users = User.objects.select_for_update().filter(mac_id=self.validated_data['mac_id'])
+            with transaction.atomic():
+                for u in users:
+                    u.mac_id = ""
+                    u.save()
+            user.mac_id = self.validated_data['mac_id']
+            user.save()
         token = RefreshToken.for_user(user)
 
         data = {'refresh_token': str(token), 'access_token': str(token.access_token), 'user_id': user.id,

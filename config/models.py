@@ -10,7 +10,7 @@ class ConfigManager(models.Manager):
 
 
 class Config(models.Model):
-    scenario_id = models.ForeignKey(Scenario, on_delete=models.PROTECT)
+    scenario = models.ForeignKey(Scenario, on_delete=models.PROTECT)
     breeding_point = models.TextField(blank=True, null=True)
     is_owner_at_home = models.BooleanField(default=True)
     is_owner_appeal = models.BooleanField(default=False)

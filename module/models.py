@@ -26,7 +26,7 @@ class ScenarioManager(models.Manager):
 
 
 class Scenario(models.Model):
-    module_id = models.ForeignKey(Module, on_delete=models.PROTECT)
+    module = models.ForeignKey(Module, on_delete=models.PROTECT)
     description = models.TextField(blank=True, null=True)
     cover_image = models.ImageField(upload_to='upload/scenario')
     high_rise = models.BooleanField(default=False)
