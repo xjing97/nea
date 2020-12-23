@@ -27,7 +27,6 @@ class ScenarioManager(models.Manager):
 
 class Scenario(models.Model):
     module_id = models.ForeignKey(Module, on_delete=models.PROTECT)
-    user_id = models.ManyToManyField(User)
     description = models.TextField(blank=True, null=True)
     cover_image = models.ImageField(upload_to='upload/scenario')
     high_rise = models.BooleanField(default=False)

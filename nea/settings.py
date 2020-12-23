@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'core',
     'module',
-    'config'
+    'config',
+    'result',
 ]
 
 MIDDLEWARE = [

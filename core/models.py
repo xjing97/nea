@@ -46,6 +46,7 @@ class User(AbstractUser):
     profile_pic = models.ImageField(upload_to='upload/profile-pic', default=None)
     soeId = models.CharField(max_length=50, blank=True)
     department = models.CharField(max_length=100, blank=True)
+    mac_id = models.TextField(default="")
     date_of_birth = models.DateField(null=True, blank=True)
 
     def __str__(self):

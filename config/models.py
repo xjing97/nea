@@ -17,5 +17,6 @@ class Config(models.Model):
     is_refuse_entry = models.BooleanField(default=False)
     critical_points = models.TextField(blank=True, null=True)
     config = models.TextField(default=json.dumps({}))
+    mac_ids = models.TextField(default=json.dumps([]))
     dateCreated = models.DateTimeField(auto_now_add=True)
     dateUpdated = models.DateTimeField(auto_now=True)
