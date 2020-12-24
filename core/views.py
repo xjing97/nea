@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
@@ -12,6 +14,8 @@ from rest_framework.decorators import api_view
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_acc(request):
+    print(request.data)
+    print(type(request.data))
     form = SignUpSerializer(data=request.data)
     if not form.is_valid():
         return Response(status=400, data=form.errors)
@@ -61,11 +65,14 @@ def renewToken(request):
     print(request.data)
     user = request.user
     refresh_token = request.data['refreshToken']
-    token = RefreshToken(refresh_token)
+    try:
+        token = RefreshToken(refresh_token)
 
-    data = {'refresh_token': str(token), 'access_token': str(token.access_token), 'user_id': user.id,
-            'user_name': user.username, 'expires_at': AccessToken.lifetime}
-    return Response(data={'data': data})
+        data = {'refresh_token': str(token), 'access_token': str(token.access_token), 'user_id': user.id,
+                'user_name': user.username, 'expires_at': datetime.now() + AccessToken.lifetime}
+        return Response(data={'data': data})
+    except Exception as e:
+        return Response(status=400, data={'message': str(e)})
 
 
 @api_view(['GET'])
