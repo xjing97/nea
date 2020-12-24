@@ -13,7 +13,7 @@ class SignUpSerializer(serializers.Serializer):
     date_of_birth = serializers.DateField(required=True)
     soeId = serializers.CharField(max_length=256, required=True)
     department = serializers.CharField(max_length=256, required=True)
-    profile_pic = serializers.ImageField(allow_null=True, required=False)
+    # profile_pic = serializers.ImageField(allow_null=True, required=False)
     password = serializers.CharField(max_length=256, required=True)
 
     def validate(self, data: MutableMapping[str, str]):
