@@ -58,7 +58,7 @@ class LoginSerializer(serializers.Serializer):
         token = RefreshToken.for_user(user)
 
         data = {'refresh_token': str(token), 'access_token': str(token.access_token), 'user_id': user.id,
-                'user_name': user.username, 'expires_at': datetime.now() + AccessToken.lifetime}
+                'user_name': user.username, 'expires_at': datetime.now() + RefreshToken.lifetime}
         return JsonResponse(data={'data': data, 'message': 'Login successfully'})
 
 
