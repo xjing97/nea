@@ -28,7 +28,7 @@ class SignUpSerializer(serializers.Serializer):
 
     def create_acc(self):
         with transaction.atomic():
-            user = User.objects.create_user(**self.validated_data)
+            user = User.objects.admin_create_user(**self.validated_data)
                 
         return JsonResponse(data={'data': {'user_id': user.id}, 'message': "User creation success"})
 

@@ -14,8 +14,6 @@ from rest_framework.decorators import api_view
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_acc(request):
-    print(request.data)
-    print(type(request.data))
     form = SignUpSerializer(data=request.data)
     if not form.is_valid():
         return Response(status=400, data=form.errors)
