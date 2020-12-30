@@ -2,13 +2,17 @@ import json
 
 from django.db import models
 
-# Create your models here.
-from core.models import User
 from module.constants import LEVEL
 
 
 class ModuleManager(models.Manager):
-    pass
+    def get_all_modules(self):
+        modules = list(Module.objects.values('id', 'module_name', 'date_created', 'date_updated'))
+        for module in modules:
+            scenarios = Scenario.objects.filter(module__id=module['id']).values()
+            module['scenarios'] = list(scenarios)
+
+        return modules
 
 
 class Module(models.Model):
@@ -20,15 +24,19 @@ class Module(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 
+    objects = ModuleManager()
+
     def __str__(self):
         return self.module_name
+
 
 class ScenarioManager(models.Manager):
     pass
 
 
 class Scenario(models.Model):
-    module = models.ForeignKey(Module, on_delete=models.PROTECT)
+    module = models.ForeignKey(Module, on_delete=models.PROTECT, related_name='scenario')
+    scenario_title = models.CharField(max_length=256, default="")
     description = models.TextField(blank=True, null=True)
     cover_image = models.ImageField(upload_to='upload/scenario')
     high_rise = models.BooleanField(default=False)
@@ -38,4 +46,4 @@ class Scenario(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return str(self.module)
+        return str(self.module) + ("_highrise_" if self.high_rise else "_lowrise_") + self.level
