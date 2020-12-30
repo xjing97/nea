@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
@@ -61,11 +63,14 @@ def renewToken(request):
     print(request.data)
     user = request.user
     refresh_token = request.data['refreshToken']
-    token = RefreshToken(refresh_token)
+    try:
+        token = RefreshToken(refresh_token)
 
-    data = {'refresh_token': str(token), 'access_token': str(token.access_token), 'user_id': user.id,
-            'user_name': user.username, 'expires_at': AccessToken.lifetime}
-    return Response(data={'data': data})
+        data = {'refresh_token': str(token), 'access_token': str(token.access_token), 'user_id': user.id,
+                'user_name': user.username, 'expires_at': datetime.now() + RefreshToken.lifetime}
+        return Response(data={'data': data})
+    except Exception as e:
+        return Response(status=400, data={'message': str(e)})
 
 
 @api_view(['GET'])
@@ -109,11 +114,12 @@ def deleteUser(request):
     user_id = data['user_id']
 
     user = User.objects.filter(id=user_id).first()
-    if user:
+
+    if user and user.is_active:
         user.is_active = False
         user.save()
 
-        return JsonResponse(data={'user_id': user.id}, message="User is deleted successfully")
+        return Response(data={'username': user.username, 'message': "User '" + user.username + "' is deleted"})
 
     else:
-        return JsonResponse(status_code='400', data={'user_id': user.id}, message="User not found")
+        return Response(status=400, data={'message': "User " + user.username + " not found"})

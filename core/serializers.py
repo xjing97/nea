@@ -1,3 +1,5 @@
+from datetime import timedelta, datetime
+
 from django.contrib.auth import authenticate
 from django.db import transaction
 from django.http import JsonResponse
@@ -10,11 +12,11 @@ from core.models import User
 
 class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=256, required=True)
-    date_of_birth = serializers.DateField(required=True)
+    date_of_birth = serializers.DateField(required=False)
     soeId = serializers.CharField(max_length=256, required=True)
     department = serializers.CharField(max_length=256, required=True)
-    profile_pic = serializers.ImageField(allow_null=True, required=False)
-    password = serializers.CharField(max_length=256, required=True)
+    # profile_pic = serializers.ImageField(allow_null=True, required=False)
+    # password = serializers.CharField(max_length=256, required=True)
 
     def validate(self, data: MutableMapping[str, str]):
         username = data.get('username')
@@ -26,7 +28,7 @@ class SignUpSerializer(serializers.Serializer):
 
     def create_acc(self):
         with transaction.atomic():
-            user = User.objects.create_user(**self.validated_data)
+            user = User.objects.admin_create_user(**self.validated_data)
                 
         return JsonResponse(data={'data': {'user_id': user.id}, 'message': "User creation success"})
 
@@ -56,7 +58,7 @@ class LoginSerializer(serializers.Serializer):
         token = RefreshToken.for_user(user)
 
         data = {'refresh_token': str(token), 'access_token': str(token.access_token), 'user_id': user.id,
-                'user_name': user.username, 'expires_at': AccessToken.lifetime}
+                'user_name': user.username, 'expires_at': datetime.now() + RefreshToken.lifetime}
         return JsonResponse(data={'data': data, 'message': 'Login successfully'})
 
 

@@ -33,3 +33,12 @@ def store_result(request):
         return Response(status=200, data={'result_id': result.id, 'message': 'Stored result successfully'})
     else:
         return Response(status=400, data={'message': 'Scenario ID is invalid'})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_results(request):
+    result = Result.objects.values(
+        'user__username', 'user__department', 'user__soeId', 'time_spend', 'results', 'is_pass', 'scenario_id',
+        'scenario__module__module_name', 'scenario__high_rise', 'dateCreated')
+    return Response(status=200, data={'data': list(result), 'message': 'Get all results successfully'})
