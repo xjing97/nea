@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
+import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -137,7 +138,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/static/'
-MEDIA_URL = '/uploads/'
+STATIC_URL = '/upload/'
+# MEDIA_URL = '/uploads/'
 
 AUTH_USER_MODEL = 'core.User'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'upload'),
+)
