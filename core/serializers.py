@@ -47,6 +47,11 @@ class LoginSerializer(serializers.Serializer):
 
     def login(self):
         user = authenticate(**self.validated_data)
+
+        first_time_login = False
+        if not user.last_login:
+            first_time_login = True
+
         if 'mac_id' in self.validated_data:
             users = User.objects.select_for_update().filter(mac_id=self.validated_data['mac_id'])
             with transaction.atomic():
@@ -54,11 +59,13 @@ class LoginSerializer(serializers.Serializer):
                     u.mac_id = ""
                     u.save()
             user.mac_id = self.validated_data['mac_id']
-            user.save()
+        user.last_login = datetime.now()
+        user.save()
         token = RefreshToken.for_user(user)
 
         data = {'refresh_token': str(token), 'access_token': str(token.access_token), 'user_id': user.id,
-                'user_name': user.username, 'expires_at': datetime.now() + RefreshToken.lifetime}
+                'user_name': user.username, 'expires_at': datetime.now() + RefreshToken.lifetime,
+                'first_time_login': first_time_login}
         return JsonResponse(data={'data': data, 'message': 'Login successfully'})
 
 
