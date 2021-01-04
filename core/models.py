@@ -43,6 +43,13 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+    def get_total_user_login(self):
+        users = {'active': 0, 'inactive': 0}
+        users['inactive'] = User.objects.filter(last_login__isnull=True).count()
+        users['active'] = User.objects.filter(last_login__isnull=False).count()
+
+        return users
+
 
 class User(AbstractUser):
     # profile_pic = models.ImageField(upload_to='upload/profile-pic', default=None)
