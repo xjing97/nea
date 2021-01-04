@@ -4,6 +4,7 @@ from django.db import models
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.models import Count
 
 
 class UserManager(BaseUserManager):
@@ -48,6 +49,12 @@ class UserManager(BaseUserManager):
         users['inactive'] = User.objects.filter(last_login__isnull=True).count()
         users['active'] = User.objects.filter(last_login__isnull=False).count()
 
+        return users
+
+    def get_total_users_by_department(self):
+        users = User.objects.values('department').annotate(
+            total=Count('department')
+        ).values('department', 'total')
         return users
 
 
