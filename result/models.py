@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.db import models
-from django.db.models import Count
+from django.db.models import Count, Case, When, IntegerField
 from django.db.models.functions import TruncMonth, TruncDate
 from dateutil.relativedelta import relativedelta
 
@@ -39,6 +39,26 @@ class ResultManager(models.Manager):
         ).values(
             'date', 'total'
         )
+        return results
+
+    def get_total_result_status(self):
+        """
+        Show total pass and fail
+        """
+        results = Result.objects.values('is_pass').annotate(
+            passed=Count(Case(When(is_pass=True, then=1), output_field=IntegerField())),
+            failed=Count(Case(When(is_pass=False, then=1), output_field=IntegerField())),
+        ).values('passed', 'failed')
+        return results
+
+    def group_result_status_by_module(self):
+        """
+        Show total pass and fail (group by module)
+        """
+        results = Result.objects.values('scenario__module').annotate(
+            passed=Count(Case(When(is_pass=True, then=1), output_field=IntegerField())),
+            failed=Count(Case(When(is_pass=False, then=1), output_field=IntegerField())),
+        ).values('passed', 'failed', 'scenario__module__module_name')
         return results
 
 
