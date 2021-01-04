@@ -1,6 +1,7 @@
 import json
 
 from django.db import models
+from django.db.models import Count, Max
 
 from module.constants import LEVEL
 
@@ -11,6 +12,16 @@ class ModuleManager(models.Manager):
         for module in modules:
             scenarios = Scenario.objects.filter(module__id=module['id']).values()
             module['scenarios'] = list(scenarios)
+
+        return modules
+
+    def count_modules_by_difficulty(self):
+        modules = Scenario.objects.values(
+            'level'
+        ).annotate(
+            total=Count('level'),
+            latest=Max('date_updated')
+        ).values('total', 'level', 'latest')
 
         return modules
 
