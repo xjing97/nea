@@ -74,7 +74,7 @@ def renewToken(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getUser(request):
-    user_id = request.GET.get('user_id')
+    user_id = request.GET.get('user_id', '')
     user = User.objects.filter(id=user_id).first()
     if user:
         res = Response(data={'data': {'user_id': user.id,
@@ -121,3 +121,12 @@ def deleteUser(request):
 
     else:
         return Response(status=400, data={'message': "User " + user.username + " not found"})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout(request):
+    user_id = request.user.id
+    user = User.objects.filter(id=user_id).first()
+    user.mac_id = ''
+    user.save()
+    return Response(data={'message': "User logout successfully"})

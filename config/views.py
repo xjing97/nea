@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from config.models import Config
+from core.models import User
 from result.models import Result
 
 
@@ -16,7 +17,10 @@ def get_config_by_macid(request):
     user_id = request.user.id
     mac_id = request.GET.get('mac_id', '')
     if not mac_id:
-        return Response(status=400, data={'message': 'mac_id is required'})
+        user = User.objects.filter(id=user_id).first()
+        mac_id = user.mac_id
+        if not mac_id:
+            return Response(status=400, data={'message': 'mac_id is required'})
 
     # check quiz can be retake or not and user's attempt
     attended_modules = Result.objects.filter(
