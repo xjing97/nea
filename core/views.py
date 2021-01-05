@@ -60,14 +60,12 @@ def login(request):
 @api_view(['POST'])
 @permission_exempt
 def renewToken(request):
-    print(request.data)
-    user = request.user
     refresh_token = request.data['refreshToken']
     try:
         token = RefreshToken(refresh_token)
 
-        data = {'refresh_token': str(token), 'access_token': str(token.access_token), 'user_id': user.id,
-                'user_name': user.username, 'expires_at': datetime.now() + RefreshToken.lifetime}
+        data = {'refresh_token': str(token), 'access_token': str(token.access_token),
+                'expires_at': datetime.now() + RefreshToken.lifetime}
         return Response(data={'data': data})
     except Exception as e:
         return Response(status=400, data={'message': str(e)})
