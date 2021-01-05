@@ -10,35 +10,54 @@ from module.models import Scenario
 
 
 class ResultManager(models.Manager):
-    def get_results_by_month(self):
+    def get_results_by_month(self, group_by_department=False):
         """
         get_results_by_month for the past 12 months
         """
         current_month = datetime(datetime.now().year, datetime.now().month, 1)
         next_month = current_month + relativedelta(months=1)
         prev_12_months = current_month - relativedelta(months=11)
-        results = Result.objects.filter(dateCreated__gte=prev_12_months, dateCreated__lt=next_month).annotate(
-            month=TruncMonth('dateCreated')
-        ).values('month').annotate(
-            total=Count('month')
-        ).values(
-            'month', 'total'
-        )
+
+        if group_by_department:
+            results = Result.objects.filter(dateCreated__gte=prev_12_months, dateCreated__lt=next_month).annotate(
+                month=TruncMonth('dateCreated')
+            ).values('month', 'user__department').annotate(
+                total=Count('month')
+            ).values(
+                'month', 'total', 'user__department'
+            )
+        else:
+            results = Result.objects.filter(dateCreated__gte=prev_12_months, dateCreated__lt=next_month).annotate(
+                month=TruncMonth('dateCreated')
+            ).values('month').annotate(
+                total=Count('month')
+            ).values(
+                'month', 'total'
+            )
         return results
 
-    def get_results_by_date(self, month=datetime(datetime.now().year, datetime.now().month, 1)):
+    def get_results_by_date(self, month=datetime(datetime.now().year, datetime.now().month, 1), group_by_department=False):
         """
         get_results_by_date of the month (default: current month)
         month example: datetime(2020, 12, 1)
         """
         one_month = month + relativedelta(months=1)
-        results = Result.objects.filter(dateCreated__gte=month, dateCreated__lt=one_month).annotate(
-            date=TruncDate('dateCreated')
-        ).values('date').annotate(
-            total=Count('date')
-        ).values(
-            'date', 'total'
-        )
+        if group_by_department:
+            results = Result.objects.filter(dateCreated__gte=month, dateCreated__lt=one_month).annotate(
+                date=TruncDate('dateCreated')
+            ).values('date', 'user__department').annotate(
+                total=Count('date')
+            ).values(
+                'date', 'total', 'user__department'
+            )
+        else:
+            results = Result.objects.filter(dateCreated__gte=month, dateCreated__lt=one_month).annotate(
+                date=TruncDate('dateCreated')
+            ).values('date').annotate(
+                total=Count('date')
+            ).values(
+                'date', 'total'
+            )
         return results
 
     def get_total_result_status(self):
