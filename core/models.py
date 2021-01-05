@@ -29,18 +29,20 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, date_of_birth, department, soeId, password=None):
+    def create_superuser(self, username, date_of_birth=None, department='Admin', soeId='999', email=None, password=None):
         """
         Creates and saves a superuser with the given username, date of birth, department, soeId and password.
         """
-        user = self.create_user(
+        user = self.model(
             username=username,
             date_of_birth=date_of_birth,
             department=department,
             soeId=soeId,
-            password=password
+            password=password,
+            email=email
         )
         user.is_staff = True
+        user.is_superuser = True
         user.save(using=self._db)
         return user
 
