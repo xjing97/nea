@@ -122,6 +122,7 @@ def deleteUser(request):
     else:
         return Response(status=400, data={'message': "User " + user.username + " not found"})
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout(request):
@@ -130,3 +131,10 @@ def logout(request):
     user.mac_id = ''
     user.save()
     return Response(data={'message': "User logout successfully"})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def userDashboard(request):
+    department_active = User.objects.get_total_users_by_department()
+    return Response(data={'department_active': list(department_active)})
