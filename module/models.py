@@ -23,7 +23,25 @@ class ModuleManager(models.Manager):
             latest=Max('date_updated')
         ).values('total', 'level', 'latest')
 
-        return modules
+        difficulty = {
+            'Easy': {'total': 0, 'latest': None},
+            'Medium': {'total': 0, 'latest': None},
+            'Hard': {'total': 0, 'latest': None},
+            'All': {'total': 0, 'latest': None},
+        }
+        total = 0
+        latest = None
+        for module in list(modules):
+            difficulty[module['level']] = {'total': module['total'], 'latest': module['latest']}
+            total += module['total']
+            if not latest:
+                latest = module['latest']
+            elif module['latest'] > latest:
+                latest = module['latest']
+
+        difficulty['All'] = {'total': total, 'latest': latest}
+
+        return difficulty
 
 
 class Module(models.Model):

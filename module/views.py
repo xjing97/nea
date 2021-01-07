@@ -14,3 +14,11 @@ def get_all_modules(request):
     modules = Module.objects.get_all_modules()
 
     return Response(data={'data': modules})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def count_modules_by_difficulty(request):
+    modules = Module.objects.count_modules_by_difficulty()
+
+    return Response(data={'data': modules})
