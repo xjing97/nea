@@ -69,10 +69,10 @@ class ResultManager(models.Manager):
         """
         Show total pass and fail
         """
-        results = Result.objects.values('is_pass').annotate(
+        results = Result.objects.aggregate(
             passed=Count(Case(When(is_pass=True, then=1), output_field=IntegerField())),
             failed=Count(Case(When(is_pass=False, then=1), output_field=IntegerField())),
-        ).values('passed', 'failed')
+        )
         return results
 
     def group_result_status_by_module(self):

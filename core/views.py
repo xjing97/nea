@@ -6,6 +6,8 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 from nea.decorators import permission_exempt, permission_classes
 from rest_framework.permissions import IsAuthenticated
+
+from result.models import Result
 from .models import User
 from .serializers import SignUpSerializer, LoginSerializer, UserSerializer
 from rest_framework.decorators import api_view
@@ -137,4 +139,5 @@ def logout(request):
 @permission_classes([IsAuthenticated])
 def userDashboard(request):
     department_active = User.objects.get_total_users_by_department()
-    return Response(data={'department_active': list(department_active)})
+    overall_pass_fail = Result.objects.get_total_result_status()
+    return Response(data={'department_active': list(department_active), 'overall_pass_fail': overall_pass_fail})
