@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 
 from django.shortcuts import render
@@ -42,3 +43,15 @@ def get_all_results(request):
         'user__username', 'user__department', 'user__soeId', 'time_spend', 'results', 'is_pass', 'scenario_id',
         'scenario__module__module_name', 'scenario__high_rise', 'dateCreated')
     return Response(status=200, data={'data': list(result), 'message': 'Get all results successfully'})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_results_by_date(request):
+    months = None
+    result = None
+    if request.GET.get('dataType', 'Month') == 'Year':
+        result, months = Result.objects.get_results_by_month(group_by_department=True)
+    elif request.GET.get('dataType', 'Month') == 'Month':
+        result = Result.objects.get_results_by_date(group_by_department=True)
+    return Response(status=200, data={'data': result, 'months': months, 'message': 'Success'})

@@ -34,7 +34,12 @@ class ResultManager(models.Manager):
             ).values(
                 'month', 'total'
             )
-        return results
+        months = []
+        while prev_12_months + relativedelta(months=1) <= next_month:
+            months.append(prev_12_months.strftime('%Y %m'))
+            prev_12_months = prev_12_months + relativedelta(months=1)
+
+        return results, months
 
     def get_results_by_date(self, month=datetime(datetime.now().year, datetime.now().month, 1), group_by_department=False):
         """
