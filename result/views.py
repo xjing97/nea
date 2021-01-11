@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from django.shortcuts import render
@@ -24,12 +24,19 @@ def store_result(request):
     scenario_id = data['scenario_id']
     result = data['result']
     # is_pass = True if data['is_pass'] == 'true' else False
-    time_spend = data['time_spend']
+    time_spend_str = data['time_spend']  # format should be HH:mm:ss
     mac_id = data['mac_id']
+
+    try:
+        dt = datetime.strptime(time_spend_str, '%H:%M:%S')
+        time_spend = timedelta(hours=dt.hour, minutes=dt.minute, seconds=dt.second)
+
+    except Exception as e:
+        return Response(status=400, data={'message': 'Invalid time_spend. Format should be HH:mm:ss'})
 
     scenario = Scenario.objects.filter(id=scenario_id).first()
     passing_score = scenario.module.passing_score
-    is_pass = True if result > passing_score else False
+    is_pass = True if float(result) > passing_score else False
     if scenario:
         result = Result.objects.create(user=user, scenario=scenario, results=Decimal(result), is_pass=is_pass,
                                        time_spend=time_spend)
