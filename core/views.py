@@ -140,4 +140,7 @@ def logout(request):
 def userDashboard(request):
     department_active = User.objects.get_total_users_by_department()
     overall_pass_fail = Result.objects.get_total_result_status()
-    return Response(data={'department_active': list(department_active), 'overall_pass_fail': overall_pass_fail})
+    module_pass_fail = Result.objects.group_result_status_by_module()
+    return Response(data={'department_active': list(department_active),
+                          'overall_pass_fail': overall_pass_fail,
+                          'module_pass_fail': list(module_pass_fail)})
