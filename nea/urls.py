@@ -22,4 +22,5 @@ urlpatterns = [
     path('api/', include('api.urls', namespace='api')),
     path('result/', include('result.urls', namespace='result')),
     path('modules/', include('module.urls', namespace='module')),
+    path('config/', include('config.urls', namespace='config')),
 ]
