@@ -50,9 +50,6 @@ def get_config_with_id(request):
     return Response(data={'data': {'config': {'scenario__id': config.scenario_id,
                                               'config': config.config,
                                               'breeding_point': config.breeding_point,
-                                              'is_owner_at_home': config.is_owner_at_home,
-                                              'is_owner_appeal': config.is_owner_appeal,
-                                              'is_refuse_entry': config.is_refuse_entry,
                                               'mac_ids': config.mac_ids},
                                    'scenarios': list(scenarios),
                                    'mac_ids': mac_ids}})
@@ -87,8 +84,7 @@ def get_all_configs_with_scenario_id(request):
         return Response(status=400, data={'message': 'Scenario not found'})
 
     configs = Config.objects.filter(scenario_id=scenario_id).values(
-        'id', 'scenario_id', 'breeding_point', 'is_owner_at_home', 'is_owner_appeal', 'config',
-        'is_refuse_entry', 'mac_ids', 'dateCreated', 'dateUpdated'
+        'id', 'scenario_id', 'breeding_point', 'config', 'mac_ids', 'dateCreated', 'dateUpdated'
     )
 
     return Response(data={'data': {'configs': list(configs), 'scenario_title': scenario.scenario_title}})

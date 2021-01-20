@@ -53,10 +53,6 @@ class ConfigManager(models.Manager):
 class Config(models.Model):
     scenario = models.ForeignKey(Scenario, on_delete=models.PROTECT)
     breeding_point = models.TextField(blank=True, null=True)
-    is_owner_at_home = models.BooleanField(default=True)
-    is_owner_appeal = models.BooleanField(default=False)
-    is_refuse_entry = models.BooleanField(default=False)
-    critical_points = models.TextField(blank=True, null=True)
     config = models.TextField(default=json.dumps({}))
     mac_ids = models.TextField(default=json.dumps([]))
     dateCreated = models.DateTimeField(auto_now_add=True)
