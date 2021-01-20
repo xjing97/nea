@@ -50,7 +50,7 @@ def store_result(request):
 def get_all_results(request):
     result = Result.objects.values(
         'user__username', 'user__department', 'user__soeId', 'time_spend', 'results', 'is_pass', 'scenario_id',
-        'scenario__module__module_name', 'scenario__high_rise', 'dateCreated')
+        'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated')
     return Response(status=200, data={'data': list(result), 'message': 'Get all results successfully'})
 
 

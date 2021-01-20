@@ -63,13 +63,12 @@ class ScenarioManager(models.Manager):
     def get_all_default_configs(self):
         scenarios = Scenario.objects.annotate(
             module_name=F('module__module_name'),
-            building_type=Case(When(high_rise=True, then=Value('High rise')),
-                               default=Value('Low rise'), output_field=CharField()),
+            building_type=F('inspection_site'),
             cover_photo=F('cover_image'),
             passing_score=F('module__passing_score'),
         ).values(
-            'id', 'default_config', 'module_name', 'building_type', 'cover_photo', 'description', 'level', 'scenario_title',
-            'passing_score'
+            'id', 'default_config', 'module_name', 'building_type', 'cover_photo', 'description', 'level',
+            'scenario_title', 'passing_score'
         )
 
         return scenarios
@@ -80,7 +79,8 @@ class Scenario(models.Model):
     scenario_title = models.CharField(max_length=256, default="")
     description = models.TextField(blank=True, null=True)
     cover_image = models.ImageField(upload_to='upload/scenario')
-    high_rise = models.BooleanField(default=False)
+    # high_rise = models.BooleanField(default=False)
+    inspection_site = models.CharField(max_length=256, default="")
     level = models.CharField(choices=LEVEL, max_length=256, default='Easy')
     default_config = models.TextField(default=json.dumps({}))
     date_created = models.DateTimeField(auto_now_add=True)
@@ -89,4 +89,4 @@ class Scenario(models.Model):
     objects = ScenarioManager()
 
     def __str__(self):
-        return str(self.module) + ("_highrise_" if self.high_rise else "_lowrise_") + self.level
+        return str(self.module) + "_" + self.inspection_site + "_" + self.level

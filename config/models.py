@@ -29,8 +29,7 @@ class ConfigManager(models.Manager):
             mac_ids__contains=mac_id
         ).annotate(
             module_name=F('scenario__module__module_name'),
-            building_type=Case(When(scenario__high_rise=True, then=Value('High rise')),
-                               default=Value('Low rise'), output_field=CharField()),
+            building_type=F('inspection_site'),
             cover_photo=F('scenario__cover_image'),
             description=F('scenario__description'),
             level=F('scenario__level'),
