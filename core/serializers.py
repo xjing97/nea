@@ -12,7 +12,8 @@ from core.models import User
 
 class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=256, required=True)
-    date_of_birth = serializers.DateField(required=False)
+    grc = serializers.CharField(max_length=256, required=False)
+    regional_office = serializers.CharField(max_length=256, required=False)
     soeId = serializers.CharField(max_length=256, required=True)
     department = serializers.CharField(max_length=256, required=True)
     # profile_pic = serializers.ImageField(allow_null=True, required=False)
@@ -72,7 +73,8 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.Serializer):
     user_id = serializers.IntegerField(required=True)
     username = serializers.CharField(max_length=256, required=True)
-    date_of_birth = serializers.DateField(required=True)
+    grc = serializers.CharField(max_length=256, required=True)
+    regional_office = serializers.CharField(max_length=256, required=True)
     soeId = serializers.CharField(max_length=256, required=True)
     department = serializers.CharField(max_length=256, required=True)
     # password = serializers.CharField(max_length=256, required=True)
@@ -91,14 +93,16 @@ class UserSerializer(serializers.Serializer):
         with transaction.atomic():
             if user:
                 user.username = self.validated_data['username']
-                user.date_of_birth = self.validated_data['date_of_birth']
+                user.grc = self.validated_data['grc']
+                user.regional_office = self.validated_data['regional_office']
                 user.soeId = self.validated_data['soeId']
                 user.department = self.validated_data['department']
                 # user.password = self.validated_data['password']
                 user.save()
 
                 return JsonResponse(data={'data': {'user_id': user.id, 'username': user.username, 'soeId': user.soeId,
-                                                   'department': user.department, 'date_of_birth': user.date_of_birth},
+                                                   'department': user.department, 'grc': user.grc,
+                                                   'regional_office': user.regional_office},
                                           'message': "Updated user successfully"})
 
             else:

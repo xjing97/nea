@@ -8,7 +8,7 @@ from django.db.models import Count, Case, When, IntegerField
 
 
 class UserManager(BaseUserManager):
-    def admin_create_user(self, username, date_of_birth, department, soeId, password=None):
+    def admin_create_user(self, username, grc, regional_office, department, soeId, password=None):
         """
         Creates and saves a User with the given username, date of birth, department, soeId and password.
         """
@@ -17,7 +17,8 @@ class UserManager(BaseUserManager):
 
         user = self.model(
             username=username,
-            date_of_birth=date_of_birth,
+            grc=grc,
+            regional_office=regional_office,
             department=department,
             soeId=soeId,
             # profile_pic=profile_pic
@@ -29,13 +30,14 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, date_of_birth=None, department='Admin', soeId='999', email=None, password=None):
+    def create_superuser(self, username, grc=None, regional_office=None, department='Admin', soeId='999', email=None, password=None):
         """
         Creates and saves a superuser with the given username, date of birth, department, soeId and password.
         """
         user = self.model(
             username=username,
-            date_of_birth=date_of_birth,
+            grc=grc,
+            regional_office=regional_office,
             department=department,
             soeId=soeId,
             password=password,
@@ -69,7 +71,8 @@ class User(AbstractUser):
     soeId = models.CharField(max_length=50, blank=True)
     department = models.CharField(max_length=100, blank=True)
     mac_id = models.TextField(default="")
-    date_of_birth = models.DateField(null=True, blank=True)
+    grc = models.CharField(max_length=256, blank=True)
+    regional_office = models.CharField(max_length=256, blank=True)
 
     objects = UserManager()
 

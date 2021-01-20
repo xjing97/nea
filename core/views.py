@@ -81,7 +81,8 @@ def getUser(request):
     if user:
         res = Response(data={'data': {'user_id': user.id,
                                       'username': user.username,
-                                      'date_of_birth': user.date_of_birth,
+                                      'grc': user.grc,
+                                      'regional_office': user.regional_office,
                                       'department': user.department,
                                       'soeId': user.soeId,
                                       }})
@@ -93,7 +94,11 @@ def getUser(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getAllUsers(request):
-    user = User.objects.filter(is_staff=False, is_active=True).values('id', 'username', 'date_of_birth', 'department', 'soeId')
+    user = User.objects.filter(
+        is_staff=False, is_active=True
+    ).values(
+        'id', 'username', 'grc', 'regional_office', 'department', 'soeId'
+    )
     return Response(data={'data': list(user), 'message': 'Get all users successfully'})
 
 
