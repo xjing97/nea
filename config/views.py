@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from django.db.models import F, Value
 from rest_framework.decorators import api_view, permission_classes
@@ -8,6 +9,7 @@ from rest_framework.response import Response
 from config.models import Config
 from core.models import User
 from module.models import Scenario
+from nea.validator import ValidateIsAdmin
 
 
 @api_view(['GET'])
@@ -37,9 +39,12 @@ def get_practice_config(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_config_with_id(request):
+    if 'config_id' not in request.GET:
+        return Response(status=400, data={'message': 'Required argument config_id is missing'})
+
     config_id = request.GET.get('config_id', '')
 
-    config = Config.objects.filter(id=config_id).first()
+    config = Config.objects.filter(id=config_id, date_deleted__isnull=True).first()
 
     if not config:
         return Response(status=400, data={'message': 'Configuration not found'})
@@ -83,7 +88,7 @@ def get_all_configs_with_scenario_id(request):
     if not scenario:
         return Response(status=400, data={'message': 'Scenario not found'})
 
-    configs = Config.objects.filter(scenario_id=scenario_id).values(
+    configs = Config.objects.filter(scenario_id=scenario_id, date_deleted__isnull=True).values(
         'id', 'scenario_id', 'breeding_point', 'config', 'mac_ids', 'dateCreated', 'dateUpdated'
     )
 
@@ -93,6 +98,10 @@ def get_all_configs_with_scenario_id(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_config(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
     data = request.data
     scenario_id = data['scenario_id']
     config = data['config']
@@ -113,6 +122,10 @@ def create_config(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def edit_config(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
     data = request.data
     config_id = data['config_id']
     scenario_id = data['scenario_id']
@@ -125,7 +138,7 @@ def edit_config(request):
     if not scenario:
         return Response(status=400, data={'message': 'Scenario ' + str(scenario_id) + ' not found'})
 
-    config_obj = Config.objects.filter(id=int(config_id)).first()
+    config_obj = Config.objects.filter(id=int(config_id), date_deleted__isnull=True).first()
 
     if not config:
         return Response(status=400, data={'message': 'Configuration ' + str(config_id) + ' not found'})
@@ -137,3 +150,24 @@ def edit_config(request):
     config_obj.save()
 
     return Response(data={'message': 'Success'})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def delete_config(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
+    data = request.data
+    config_id = data['config_id']
+
+    config = Config.objects.filter(id=config_id).first()
+
+    if not config:
+        return Response(status=400, data={'message': 'Invalid Config ID: %s' % config_id})
+
+    config.date_deleted = datetime.now()
+    config.save()
+
+    return Response(data={'message': 'Config %s is deleted' % config_id})

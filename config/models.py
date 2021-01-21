@@ -26,7 +26,8 @@ class ConfigManager(models.Manager):
             When(scenario__module__id=k, then=v) for k, v in attended_dict.items()
         ]
         config = Config.objects.filter(
-            mac_ids__contains=mac_id
+            mac_ids__contains=mac_id,
+            date_deleted__isnull=True
         ).annotate(
             module_name=F('scenario__module__module_name'),
             building_type=F('inspection_site'),
@@ -54,6 +55,7 @@ class Config(models.Model):
     breeding_point = models.TextField(blank=True, null=True)
     config = models.TextField(default=json.dumps({}))
     mac_ids = models.TextField(default=json.dumps([]))
+    date_deleted = models.DateTimeField(blank=True, null=True)
     dateCreated = models.DateTimeField(auto_now_add=True)
     dateUpdated = models.DateTimeField(auto_now=True)
 
