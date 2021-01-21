@@ -157,7 +157,7 @@ def changeUserPassword(request):
     user.set_password(new_password)
     user.save()
 
-    return Response(data={'data': {'username': user.username, 'user_id': user.id, 'pwd': user.password}, 'message': 'Password changed successfully.'})
+    return Response(data={'username': user.username, 'message': 'Reset password successfully.'})
 
 
 @api_view(['POST'])

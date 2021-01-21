@@ -13,6 +13,7 @@ urlpatterns = [
     path('get-user/', getUser, name='getUser'),
     path('edit-user/', editUser, name='editUser'),
     path('delete-user/', deleteUser, name='deleteUser'),
+    path('reset-user-password/', changeUserPassword, name='changeUserPassword'),
     path('get-user-dashboard/', userDashboard, name='userDashboard'),
     path('change-user-password/', changeUserPassword, name='changeUserPassword'),
 ]
