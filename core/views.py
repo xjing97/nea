@@ -1,12 +1,12 @@
 from datetime import datetime
 
-from django.http import JsonResponse
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from nea.decorators import permission_exempt, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
+from nea.validator import ValidateIsAdmin
 from result.models import Result
 from .models import User
 from .serializers import SignUpSerializer, LoginSerializer, UserSerializer
@@ -100,6 +100,35 @@ def getAllUsers(request):
         'id', 'username', 'grc', 'regional_office', 'department', 'soeId'
     )
     return Response(data={'data': list(user), 'message': 'Get all users successfully'})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def changeUserPassword(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
+    data = request.data
+    required_params_list = ('userId', 'newPassword', 'confirmPassword')
+    for param_name in required_params_list:
+        if param_name not in data:
+            return Response(status=400, data={'message': 'Required argument %s is missing' % param_name})
+
+    user_id = data['userId']
+    new_password = data['newPassword']
+    confirm_password = data['confirmPassword']
+    if new_password != confirm_password:
+        return Response(status=400, data={'message': {"confirmPassword": "Password fields didn't match."}})
+
+    user = User.objects.filter(id=user_id).first()
+    if not user:
+        return Response(status=400, data={'message': {"userId": "User not found"}})
+
+    user.set_password(new_password)
+    user.save()
+
+    return Response(data={'data': {'username': user.username, 'user_id': user.id, 'pwd': user.password}, 'message': 'Password changed successfully.'})
 
 
 @api_view(['POST'])

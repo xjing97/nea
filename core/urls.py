@@ -1,6 +1,6 @@
 from django.urls import path, include
 from .views import create_acc, mass_create_acc, login, renewToken, editUser, deleteUser, getUser, getAllUsers, \
-    userDashboard
+    userDashboard, changeUserPassword
 
 app_name = 'core'
 
@@ -14,4 +14,5 @@ urlpatterns = [
     path('edit-user/', editUser, name='editUser'),
     path('delete-user/', deleteUser, name='deleteUser'),
     path('get-user-dashboard/', userDashboard, name='userDashboard'),
+    path('change-user-password/', changeUserPassword, name='changeUserPassword'),
 ]
