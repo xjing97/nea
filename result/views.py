@@ -7,6 +7,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from config.models import Config
 from core.models import User
 from module.models import Scenario, Module
 from nea.decorators import permission_classes
@@ -23,7 +24,7 @@ def store_result(request):
     user = User.objects.filter(id=user_id).first()
     data = request.data
 
-    required_params_list = ('scenario_id', 'result', 'time_spend', 'mac_id')
+    required_params_list = ('scenario_id', 'result', 'time_spend', 'mac_id', 'config_id')
     for param_name in required_params_list:
         if param_name not in data:
             return Response(status=400, data={'message': 'Required argument %s is missing' % param_name})
@@ -33,6 +34,7 @@ def store_result(request):
     # is_pass = True if data['is_pass'] == 'true' else False
     time_spend_str = data['time_spend']  # format should be HH:mm:ss
     mac_id = data['mac_id']
+    config_id = data['config_id']
 
     try:
         dt = datetime.strptime(time_spend_str, '%H:%M:%S')
@@ -44,9 +46,15 @@ def store_result(request):
     scenario = Scenario.objects.filter(id=scenario_id).first()
     passing_score = scenario.module.passing_score
     is_pass = True if float(result) > passing_score else False
+
+    config_obj = Config.objects.filter(id=config_id).first()
+
+    if not config_obj:
+        return Response(status=400, data={'message': 'Config ID is invalid'})
+
     if scenario:
         result = Result.objects.create(user=user, scenario=scenario, results=Decimal(result), is_pass=is_pass,
-                                       time_spend=time_spend)
+                                       time_spend=time_spend, mac_id=mac_id, config=config_obj.config)
         return Response(status=200, data={'result_id': result.id, 'message': 'Stored result successfully'})
     else:
         return Response(status=400, data={'message': 'Scenario ID is invalid'})
