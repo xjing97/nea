@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from rest_framework.exceptions import ErrorDetail
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -16,6 +17,10 @@ from rest_framework.decorators import api_view
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_acc(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
     form = SignUpSerializer(data=request.data)
     if not form.is_valid():
         return Response(status=400, data=form.errors)
@@ -26,6 +31,10 @@ def create_acc(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def mass_create_acc(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
     invalid_creation = []
     records = request.data
 
@@ -54,7 +63,13 @@ def mass_create_acc(request):
 def login(request):
     form = LoginSerializer(data=request.data)
     if not form.is_valid():
+        print(form.errors)
         return Response(status=400, data=form.errors)
+    print(form.validated_data['user_id'])
+    validator = ValidateIsAdmin()
+    if not validator.validate(form.validated_data['user_id']):
+        return Response(status=403, data={'username': [ErrorDetail(string=validator.error_message, code='blank')]})
+
     res = form.login()
     return res
 
@@ -62,6 +77,9 @@ def login(request):
 @api_view(['POST'])
 @permission_exempt
 def renewToken(request):
+    if 'refreshToken' not in request.data:
+        return Response(status=400, data={'message': 'Required argument refreshToken is missing'})
+
     refresh_token = request.data['refreshToken']
     try:
         token = RefreshToken(refresh_token)
@@ -76,6 +94,13 @@ def renewToken(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getUser(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
+    if 'user_id' not in request.GET:
+        return Response(status=400, data={'message': 'Required argument user_id is missing'})
+
     user_id = request.GET.get('user_id', '')
     user = User.objects.filter(id=user_id).first()
     if user:
@@ -94,6 +119,10 @@ def getUser(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getAllUsers(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
     user = User.objects.filter(
         is_staff=False, is_active=True
     ).values(
@@ -134,6 +163,10 @@ def changeUserPassword(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def editUser(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
     form = UserSerializer(data=request.data)
     if not form.is_valid():
         return Response(status=400, data=form.errors)
@@ -144,6 +177,13 @@ def editUser(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def deleteUser(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
+    if 'user_id' not in request.data:
+        return Response(status=400, data={'message': 'Required argument user_id is missing'})
+
     data = request.data
     user_id = data['user_id']
 
@@ -172,6 +212,10 @@ def logout(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def userDashboard(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
     department_active = User.objects.get_total_users_by_department()
     overall_pass_fail = Result.objects.get_total_result_status()
     module_pass_fail = Result.objects.group_result_status_by_module()

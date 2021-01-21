@@ -44,6 +44,8 @@ class LoginSerializer(serializers.Serializer):
         if user is None:
             raise serializers.ValidationError('Username/Password not match', code='credential-not-match')
 
+        data['user_id'] = user.id
+
         return data
 
     def login(self):
