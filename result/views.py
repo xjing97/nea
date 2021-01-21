@@ -22,6 +22,12 @@ def store_result(request):
     user_id = request.user.id
     user = User.objects.filter(id=user_id).first()
     data = request.data
+
+    required_params_list = ('scenario_id', 'result', 'time_spend', 'mac_id')
+    for param_name in required_params_list:
+        if param_name not in data:
+            return Response(status=400, data={'message': 'Required argument %s is missing' % param_name})
+
     scenario_id = data['scenario_id']
     result = data['result']
     # is_pass = True if data['is_pass'] == 'true' else False
