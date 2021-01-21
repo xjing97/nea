@@ -12,6 +12,7 @@ from module.models import Scenario, Module
 from nea.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 
+from nea.validator import ValidateIsAdmin
 from .models import Result
 
 
@@ -48,6 +49,10 @@ def store_result(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_results(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
     result = Result.objects.values(
         'user__username', 'user__department', 'user__soeId', 'time_spend', 'results', 'is_pass', 'scenario_id',
         'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated')
@@ -57,6 +62,10 @@ def get_all_results(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_results_by_date(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
     months = None
     result = None
     if request.GET.get('dataType', 'Month') == 'Year':
