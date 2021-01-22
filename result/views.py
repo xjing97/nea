@@ -69,10 +69,15 @@ def get_all_results(request):
 
     result = Result.objects.values(
         'user__username', 'user__department', 'user__soeId', 'user__grc', 'user__regional_office',
-        'time_spend', 'results', 'is_pass', 'scenario_id',
+        'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
         'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated'
     ).order_by('-dateCreated')
-    return Response(status=200, data={'data': list(result), 'message': 'Get all results successfully'})
+
+    all_modules_scenarios = Module.objects.values('id', 'module_name', 'scenario__id', 'scenario__scenario_title')
+
+    return Response(status=200, data={'data': {'results': list(result),
+                                               'modules_scenarios': list(all_modules_scenarios)},
+                                      'message': 'Get all results successfully'})
 
 
 @api_view(['GET'])
