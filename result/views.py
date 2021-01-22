@@ -68,8 +68,10 @@ def get_all_results(request):
         return Response(status=403, data={'message': validator.error_message})
 
     result = Result.objects.values(
-        'user__username', 'user__department', 'user__soeId', 'time_spend', 'results', 'is_pass', 'scenario_id',
-        'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated')
+        'user__username', 'user__department', 'user__soeId', 'user__grc', 'user__regional_office',
+        'time_spend', 'results', 'is_pass', 'scenario_id',
+        'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated'
+    ).order_by('-dateCreated')
     return Response(status=200, data={'data': list(result), 'message': 'Get all results successfully'})
 
 
