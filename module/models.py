@@ -63,11 +63,9 @@ class ScenarioManager(models.Manager):
         scenarios = Scenario.objects.annotate(
             module_name=F('module__module_name'),
             building_type=F('inspection_site'),
-            cover_photo=F('cover_image'),
-            passing_score=Value('80.0'),
+            cover_photo=F('cover_image')
         ).values(
-            'id', 'default_config', 'module_name', 'building_type', 'cover_photo', 'description', 'level',
-            'scenario_title', 'passing_score'
+            'id', 'default_config', 'module_name', 'building_type', 'cover_photo', 'description', 'scenario_title'
         )
 
         return scenarios
