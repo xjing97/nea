@@ -30,7 +30,7 @@ class ConfigManager(models.Manager):
             date_deleted__isnull=True
         ).annotate(
             module_name=F('scenario__module__module_name'),
-            building_type=F('inspection_site'),
+            building_type=F('scenario__inspection_site'),
             cover_photo=F('scenario__cover_image'),
             description=F('scenario__description'),
             level=F('scenario__level'),
