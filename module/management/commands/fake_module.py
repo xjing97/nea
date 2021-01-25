@@ -7,11 +7,11 @@ from module.models import Module, Scenario
 
 class Command(BaseCommand):
     def handle(self, **args):
-        module1 = Module.objects.create(module_name='Module 1', description='This is module 1', passing_score=60,
+        module1 = Module.objects.create(module_name='Module 1', description='This is module 1',
                                        quiz_can_retake=True, quiz_attempt=2)
         module1.date_created = datetime(2021, 1, 3)
         module1.save()
-        module2 = Module.objects.create(module_name='Module 2', description='This is module 2', passing_score=60,
+        module2 = Module.objects.create(module_name='Module 2', description='This is module 2',
                                        quiz_can_retake=False, quiz_attempt=1)
         module2.date_created = datetime(2021, 1, 4)
         module2.save()

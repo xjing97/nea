@@ -47,7 +47,6 @@ class ModuleManager(models.Manager):
 class Module(models.Model):
     module_name = models.CharField(max_length=256, default="")
     description = models.TextField(blank=True, null=True)
-    passing_score = models.FloatField(default=50.0)
     quiz_can_retake = models.BooleanField(default=False)
     quiz_attempt = models.IntegerField(default=1)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -65,7 +64,7 @@ class ScenarioManager(models.Manager):
             module_name=F('module__module_name'),
             building_type=F('inspection_site'),
             cover_photo=F('cover_image'),
-            passing_score=F('module__passing_score'),
+            passing_score=Value('80.0'),
         ).values(
             'id', 'default_config', 'module_name', 'building_type', 'cover_photo', 'description', 'level',
             'scenario_title', 'passing_score'

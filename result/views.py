@@ -24,12 +24,11 @@ def store_result(request):
     user = User.objects.filter(id=user_id).first()
     data = request.data
 
-    required_params_list = ('scenario_id', 'result', 'time_spend', 'mac_id', 'config_id', 'audio_file')
+    required_params_list = ('result', 'time_spend', 'mac_id', 'config_id', 'audio_file')
     for param_name in required_params_list:
         if param_name not in data:
             return Response(status=400, data={'message': 'Required argument %s is missing' % param_name})
 
-    scenario_id = data['scenario_id']
     result = data['result']
     # is_pass = True if data['is_pass'] == 'true' else False
     time_spend_str = data['time_spend']  # format should be HH:mm:ss
@@ -44,11 +43,11 @@ def store_result(request):
     except Exception as e:
         return Response(status=400, data={'message': 'Invalid time_spend. Format should be HH:mm:ss'})
 
-    scenario = Scenario.objects.filter(id=scenario_id).first()
-    passing_score = scenario.module.passing_score
-    is_pass = True if float(result) > passing_score else False
-
     config_obj = Config.objects.filter(id=config_id).first()
+    scenario = config_obj.scenario
+
+    passing_score = config_obj.passing_score
+    is_pass = True if float(result) > passing_score else False
 
     if not config_obj:
         return Response(status=400, data={'message': 'Config ID is invalid'})

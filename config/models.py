@@ -35,7 +35,6 @@ class ConfigManager(models.Manager):
             description=F('scenario__description'),
             level=F('scenario__level'),
             scenario_title=F('scenario__scenario_title'),
-            passing_score=F('scenario__module__passing_score'),
             quiz_attempt=F('scenario__module__quiz_attempt'),
             user_attempt=Case(*whens, default=0, output_field=IntegerField()),
         ).annotate(
@@ -55,6 +54,7 @@ class Config(models.Model):
     breeding_point = models.TextField(blank=True, null=True)
     config = models.TextField(default=json.dumps({}))
     mac_ids = models.TextField(default=json.dumps([]))
+    passing_score = models.FloatField(default=80.0)
     date_deleted = models.DateTimeField(blank=True, null=True)
     dateCreated = models.DateTimeField(auto_now_add=True)
     dateUpdated = models.DateTimeField(auto_now=True)
