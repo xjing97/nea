@@ -94,6 +94,7 @@ class Result(models.Model):
     is_pass = models.BooleanField(blank=True, null=True)
     mac_id = models.CharField(max_length=256, default="")
     config = models.TextField(blank=True, null=True)
+    audio = models.FileField(upload_to='upload/audio', blank=True, null=True)
     dateCreated = models.DateTimeField(auto_now_add=True)
     dateUpdated = models.DateTimeField(auto_now=True)
 

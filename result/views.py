@@ -24,7 +24,7 @@ def store_result(request):
     user = User.objects.filter(id=user_id).first()
     data = request.data
 
-    required_params_list = ('scenario_id', 'result', 'time_spend', 'mac_id', 'config_id')
+    required_params_list = ('scenario_id', 'result', 'time_spend', 'mac_id', 'config_id', 'audio_file')
     for param_name in required_params_list:
         if param_name not in data:
             return Response(status=400, data={'message': 'Required argument %s is missing' % param_name})
@@ -35,6 +35,7 @@ def store_result(request):
     time_spend_str = data['time_spend']  # format should be HH:mm:ss
     mac_id = data['mac_id']
     config_id = data['config_id']
+    audio_file = data['audio_file']
 
     try:
         dt = datetime.strptime(time_spend_str, '%H:%M:%S')
@@ -54,7 +55,7 @@ def store_result(request):
 
     if scenario:
         result = Result.objects.create(user=user, scenario=scenario, results=Decimal(result), is_pass=is_pass,
-                                       time_spend=time_spend, mac_id=mac_id, config=config_obj.config)
+                                       time_spend=time_spend, mac_id=mac_id, config=config_obj.config, audio=audio_file)
         return Response(status=200, data={'result_id': result.id, 'message': 'Stored result successfully'})
     else:
         return Response(status=400, data={'message': 'Scenario ID is invalid'})
@@ -68,9 +69,9 @@ def get_all_results(request):
         return Response(status=403, data={'message': validator.error_message})
 
     result = Result.objects.values(
-        'user__username', 'user__department', 'user__soeId', 'user__grc', 'user__regional_office',
+        'id', 'user__username', 'user__department', 'user__soeId', 'user__grc', 'user__regional_office',
         'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
-        'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated'
+        'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated', 'audio'
     ).order_by('-dateCreated')
 
     all_modules_scenarios = Module.objects.values('id', 'module_name', 'scenario__id', 'scenario__scenario_title')
