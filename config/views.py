@@ -55,6 +55,7 @@ def get_config_with_id(request):
     return Response(data={'data': {'config': {'scenario__id': config.scenario_id,
                                               'config': config.config,
                                               'breeding_point': config.breeding_point,
+                                              'passing_score': config.passing_score,
                                               'mac_ids': config.mac_ids},
                                    'scenarios': list(scenarios),
                                    'mac_ids': mac_ids}})
@@ -89,7 +90,7 @@ def get_all_configs_with_scenario_id(request):
         return Response(status=400, data={'message': 'Scenario not found'})
 
     configs = Config.objects.filter(scenario_id=scenario_id, date_deleted__isnull=True).values(
-        'id', 'scenario_id', 'breeding_point', 'config', 'mac_ids', 'dateCreated', 'dateUpdated'
+        'id', 'scenario_id', 'breeding_point', 'config', 'mac_ids', 'passing_score', 'dateCreated', 'dateUpdated'
     )
 
     return Response(data={'data': {'configs': list(configs), 'scenario_title': scenario.scenario_title}})
@@ -107,13 +108,14 @@ def create_config(request):
     config = data['config']
     breeding_points = data['breeding_points']
     mac_ids = data['mac_ids']
+    passing_score = data['passing_score']
 
     scenario = Scenario.objects.filter(id=int(scenario_id)).first()
 
     if not scenario:
         return Response(status=400, data={'message': 'Scenario not found'})
 
-    Config.objects.create(scenario=scenario, config=json.dumps(config),
+    Config.objects.create(scenario=scenario, config=json.dumps(config), passing_score=passing_score,
                           breeding_point=json.dumps(breeding_points), mac_ids=json.dumps(mac_ids))
 
     return Response(data={'message': 'Success'})
@@ -132,6 +134,7 @@ def edit_config(request):
     config = data['config']
     breeding_points = data['breeding_points']
     mac_ids = data['mac_ids']
+    passing_score = data['passing_score']
 
     scenario = Scenario.objects.filter(id=int(scenario_id)).first()
 
@@ -147,6 +150,7 @@ def edit_config(request):
     config_obj.mac_ids = json.dumps(mac_ids)
     config_obj.config = json.dumps(config)
     config_obj.breeding_point = json.dumps(breeding_points)
+    config_obj.passing_score = passing_score
     config_obj.save()
 
     return Response(data={'message': 'Success'})
