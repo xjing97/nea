@@ -14,9 +14,9 @@ class ModuleAdmin(admin.ModelAdmin):
 
 
 class ScenarioAdmin(admin.ModelAdmin):
-    list_display = ('module', 'description', 'cover_image', 'inspection_site', 'level', 'default_config', 'date_created',
+    list_display = ('module', 'scenario_title', 'description', 'cover_image', 'inspection_site', 'date_created',
                     'date_updated')
-    list_filter = ('module', 'description', 'cover_image', 'inspection_site', 'level', 'default_config', 'date_created',
+    list_filter = ('module', 'scenario_title', 'description', 'cover_image', 'inspection_site', 'date_created',
                    'date_updated')
     search_fields = ('module',)
     ordering = ('module',)

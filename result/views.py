@@ -24,37 +24,50 @@ def store_result(request):
     user = User.objects.filter(id=user_id).first()
     data = request.data
 
-    required_params_list = ('result', 'time_spend', 'mac_id', 'config_id', 'audio_file')
+    required_params_list = ('result', 'inspection_start', 'inspection_end', 'time_spend', 'mac_id', 'config_id',
+                            'breeding_points_found', 'breeding_points_not_found', 'audio_file')
     for param_name in required_params_list:
         if param_name not in data:
             return Response(status=400, data={'message': 'Required argument %s is missing' % param_name})
 
     result = data['result']
     # is_pass = True if data['is_pass'] == 'true' else False
+    start_time_str = data['inspection_start']
+    end_time_str = data['inspection_end']
     time_spend_str = data['time_spend']  # format should be HH:mm:ss
     mac_id = data['mac_id']
     config_id = data['config_id']
+    breeding_points_found = data['breeding_points_found']
+    breeding_points_not_found = data['breeding_points_not_found']
     audio_file = data['audio_file']
 
     try:
         dt = datetime.strptime(time_spend_str, '%H:%M:%S')
         time_spend = timedelta(hours=dt.hour, minutes=dt.minute, seconds=dt.second)
+        start_time = datetime.strptime(start_time_str, '%d/%m/%Y %H:%M:%S')
+        end_time = datetime.strptime(end_time_str, '%d/%m/%Y %H:%M:%S')
 
     except Exception as e:
-        return Response(status=400, data={'message': 'Invalid time_spend. Format should be HH:mm:ss'})
+        return Response(status=400, data={'message': str(e)})
 
     config_obj = Config.objects.filter(id=config_id).first()
-    scenario = config_obj.scenario
-
-    passing_score = config_obj.passing_score
-    is_pass = True if float(result) > passing_score else False
 
     if not config_obj:
         return Response(status=400, data={'message': 'Config ID is invalid'})
 
+    scenario = config_obj.scenario
+    passing_score = config_obj.passing_score
+    is_pass = True if float(result) > passing_score else False
+
+    breeding_points = config_obj.breeding_point
+
     if scenario:
         result = Result.objects.create(user=user, scenario=scenario, results=Decimal(result), is_pass=is_pass,
-                                       time_spend=time_spend, mac_id=mac_id, config=config_obj.config, audio=audio_file)
+                                       start_time=start_time, end_time=end_time, breeding_points=breeding_points,
+                                       breeding_points_found=breeding_points_found,
+                                       breeding_points_not_found=breeding_points_not_found,
+                                       time_spend=time_spend, mac_id=mac_id, config=config_obj.config,
+                                       audio=audio_file)
         return Response(status=200, data={'result_id': result.id, 'message': 'Stored result successfully'})
     else:
         return Response(status=400, data={'message': 'Scenario ID is invalid'})
@@ -70,7 +83,8 @@ def get_all_results(request):
     result = Result.objects.values(
         'id', 'user__username', 'user__department', 'user__soeId', 'user__grc', 'user__regional_office',
         'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
-        'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated', 'audio'
+        'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated', 'audio', 'start_time', 'end_time',
+        'breeding_points', 'breeding_points_not_found', 'breeding_points_found'
     ).order_by('-dateCreated')
 
     all_modules_scenarios = Module.objects.values('id', 'module_name', 'scenario__id', 'scenario__scenario_title')
