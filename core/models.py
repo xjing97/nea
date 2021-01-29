@@ -50,14 +50,14 @@ class UserManager(BaseUserManager):
 
     def get_total_user_login(self):
         users = {'active': 0, 'inactive': 0}
-        users['inactive'] = User.objects.filter(last_login__isnull=True).count()
-        users['active'] = User.objects.filter(last_login__isnull=False).count()
+        users['inactive'] = User.objects.filter(last_login__isnull=True, is_active=True).count()
+        users['active'] = User.objects.filter(last_login__isnull=False, is_active=True).count()
 
         return users
 
     def get_total_users_by_department(self):
         users = User.objects.filter(
-            is_staff=False
+            is_staff=False, is_active=True
         ).values('department').annotate(
             total=Count('department'),
             active=Count(Case(When(last_login__isnull=False, then=1), output_field=IntegerField()))

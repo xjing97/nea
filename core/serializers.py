@@ -44,6 +44,9 @@ class LoginSerializer(serializers.Serializer):
         if user is None:
             raise serializers.ValidationError('Username/Password not match', code='credential-not-match')
 
+        if not user.is_active:
+            raise serializers.ValidationError('Account is deleted by admin', code='credential-not-match')
+
         data['user_id'] = user.id
 
         return data
@@ -83,7 +86,7 @@ class UserSerializer(serializers.Serializer):
 
     def validate(self, data: MutableMapping[str, str]):
         user_id = data.get('user_id')
-        user = User.objects.filter(id=user_id).first()
+        user = User.objects.filter(id=user_id, is_active=True).first()
         if user is None:
             raise serializers.ValidationError('User does not exists', code='invalid')
 

@@ -102,7 +102,7 @@ def getUser(request):
         return Response(status=400, data={'message': 'Required argument user_id is missing'})
 
     user_id = request.GET.get('user_id', '')
-    user = User.objects.filter(id=user_id).first()
+    user = User.objects.filter(id=user_id, is_active=True).first()
     if user:
         res = Response(data={'data': {'user_id': user.id,
                                       'username': user.username,
