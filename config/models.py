@@ -35,11 +35,11 @@ class ConfigManager(models.Manager):
             description=F('scenario__description'),
             level=F('scenario__level'),
             scenario_title=F('scenario__scenario_title'),
-            quiz_attempt=F('scenario__module__quiz_attempt'),
+            quiz_attempt=F('scenario__quiz_attempt'),
             user_attempt=Case(*whens, default=0, output_field=IntegerField()),
         ).annotate(
             user_can_attend=Case(
-                When(user_attempt__lt=F('scenario__module__quiz_attempt'), then=Value(True)),
+                When(user_attempt__lt=F('scenario__quiz_attempt'), then=Value(True)),
                 default=Value(False), output_field=BooleanField()
             ),
         ).values(
