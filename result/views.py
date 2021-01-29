@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
 
+from dateutil.relativedelta import relativedelta
 from django.shortcuts import render
 
 # Create your views here.
@@ -80,7 +81,9 @@ def get_all_results(request):
     if not validator.validate(request.user.id):
         return Response(status=403, data={'message': validator.error_message})
 
-    result = Result.objects.values(
+    result = Result.objects.filter(
+        user__is_active=True
+    ).values(
         'id', 'user__username', 'user__department', 'user__soeId', 'user__grc', 'user__regional_office',
         'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
         'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated', 'audio', 'start_time', 'end_time',
@@ -101,10 +104,26 @@ def get_results_by_date(request):
     if not validator.validate(request.user.id):
         return Response(status=403, data={'message': validator.error_message})
 
-    months = None
-    result = None
-    if request.GET.get('dataType', 'Month') == 'Year':
-        result, months = Result.objects.get_results_by_month(group_by_department=True)
-    elif request.GET.get('dataType', 'Month') == 'Month':
-        result = Result.objects.get_results_by_date(group_by_department=True)
-    return Response(status=200, data={'data': result, 'months': months, 'message': 'Success'})
+    data_type = request.GET.get('dataType', 'Day')
+    from_date_str = request.GET.get('fromDate', '')
+    to_date_str = request.GET.get('toDate', '')
+    from_month_str = request.GET.get('fromMonth', '')
+    to_month_str = request.GET.get('toMonth', '')
+
+    if data_type == 'Day':
+        from_date = datetime.strptime(from_date_str, '%Y-%m-%d') if from_date_str else \
+            datetime(datetime.now().year, datetime.now().month, 1)
+        to_date = datetime.strptime(to_date_str, '%Y-%m-%d') + relativedelta(days=1) if to_date_str else datetime.now()
+
+        result, x_axis = Result.objects.get_results_with_date_range(from_date=from_date, to_date=to_date,
+                                                                    group_by_department=True)
+    else:
+        from_month = datetime.strptime(from_month_str, '%Y-%m') if from_month_str else \
+            datetime(datetime.now().year, datetime.now().month, 1) - relativedelta(months=11)
+        to_month = datetime.strptime(to_month_str, '%Y-%m') + relativedelta(months=1) if to_month_str else datetime(
+            datetime.now().year, datetime.now().month, 1) + relativedelta(months=1)
+
+        result, x_axis = Result.objects.get_results_with_month_range(from_date=from_month, to_date=to_month,
+                                                                     group_by_department=True)
+
+    return Response(status=200, data={'data': result, 'x_axis': x_axis, 'message': 'Success'})
