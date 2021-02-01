@@ -87,3 +87,13 @@ class Scenario(models.Model):
 
     def __str__(self):
         return str(self.module) + "_" + self.inspection_site + "_" + self.level
+
+    def edit_quiz_attempt(self, quiz_attempt=1):
+        quiz_can_retake = False
+
+        if quiz_attempt > 1:
+            quiz_can_retake = True
+
+        self.quiz_attempt = quiz_attempt
+        self.quiz_can_retake = quiz_can_retake
+        self.save()
