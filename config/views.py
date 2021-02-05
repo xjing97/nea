@@ -115,7 +115,7 @@ def create_config(request):
     if not scenario:
         return Response(status=400, data={'message': 'Scenario not found'})
 
-    Config.objects.create(scenario=scenario, config=json.dumps(config), passing_score=passing_score,
+    Config.objects.create(scenario=scenario, config=json.dumps(config, ensure_ascii=False), passing_score=passing_score,
                           breeding_point=json.dumps(breeding_points), mac_ids=json.dumps(mac_ids))
 
     return Response(data={'message': 'Success'})
@@ -148,7 +148,7 @@ def edit_config(request):
 
     config_obj.scenario = scenario
     config_obj.mac_ids = json.dumps(mac_ids)
-    config_obj.config = json.dumps(config)
+    config_obj.config = json.dumps(config, ensure_ascii=False)
     config_obj.breeding_point = json.dumps(breeding_points)
     config_obj.passing_score = passing_score
     config_obj.save()
