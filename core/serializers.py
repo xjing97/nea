@@ -14,7 +14,7 @@ class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=256, required=True)
     grc = serializers.CharField(max_length=256, required=False)
     regional_office = serializers.CharField(max_length=256, required=False)
-    soeId = serializers.CharField(max_length=256, required=True)
+    soeId = serializers.CharField(max_length=256, required=False)
     department = serializers.CharField(max_length=256, required=True)
     # profile_pic = serializers.ImageField(allow_null=True, required=False)
     # password = serializers.CharField(max_length=256, required=True)
@@ -25,10 +25,18 @@ class SignUpSerializer(serializers.Serializer):
         if existing_user:
             raise serializers.ValidationError({'username': 'Username is already taken'}, code='invalid')
 
+        if not data.get('soeId'):
+            raise serializers.ValidationError({'soeId': 'Soe ID is required'}, code='invalid')
+        if not data.get('grc'):
+            raise serializers.ValidationError({'grc': 'GRC is required'}, code='invalid')
+        if not data.get('regional_office'):
+            raise serializers.ValidationError({'regional_office': 'Regional Office is required'}, code='invalid')
+
         return data
 
     def create_acc(self):
         with transaction.atomic():
+            print(self.validated_data)
             user = User.objects.admin_create_user(**self.validated_data)
                 
         return JsonResponse(data={'data': {'user_id': user.id}, 'message': "User creation success"})
