@@ -50,7 +50,7 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, data: MutableMapping[str, str]):
         user = authenticate(**data)
         if user is None:
-            raise serializers.ValidationError('Username/Password not match', code='credential-not-match')
+            raise serializers.ValidationError('Username/Password does not match', code='credential-not-match')
 
         if not user.is_active:
             raise serializers.ValidationError('Account is deleted by admin', code='credential-not-match')
