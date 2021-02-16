@@ -43,8 +43,8 @@ class SignUpSerializer(serializers.Serializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=256, required=False)
-    password = serializers.CharField(max_length=256, required=False)
+    username = serializers.CharField(max_length=256, required=True, allow_blank=True)
+    password = serializers.CharField(max_length=256, required=True, allow_blank=True)
     mac_id = serializers.CharField(max_length=256, required=False)
 
     def validate(self, data: MutableMapping[str, str]):
