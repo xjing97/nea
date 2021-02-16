@@ -43,11 +43,20 @@ class SignUpSerializer(serializers.Serializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=256, required=True)
-    password = serializers.CharField(max_length=256, required=True)
+    username = serializers.CharField(max_length=256, required=False)
+    password = serializers.CharField(max_length=256, required=False)
     mac_id = serializers.CharField(max_length=256, required=False)
 
     def validate(self, data: MutableMapping[str, str]):
+        if not data.get('username') and not data.get('password'):
+            raise serializers.ValidationError({'username': 'Username is required', 'password': 'Password is required'},
+                                              code='blank')
+
+        if not data.get('username'):
+            raise serializers.ValidationError({'username': 'Username is required'}, code='blank')
+        if not data.get('password'):
+            raise serializers.ValidationError({'password': 'Password is required'}, code='blank')
+
         user = authenticate(**data)
         if user is None:
             raise serializers.ValidationError('Username/Password does not match', code='credential-not-match')
