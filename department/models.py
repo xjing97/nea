@@ -6,6 +6,9 @@ class UserDepartment(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.department_name
+
 
 class GRC(models.Model):
     user_department = models.ForeignKey(UserDepartment, on_delete=models.PROTECT, related_name='grc')
@@ -16,6 +19,9 @@ class GRC(models.Model):
     class Meta:
         unique_together = ['user_department', 'grc_name']
 
+    def __str__(self):
+        return self.grc_name
+
 
 class Division(models.Model):
     grc = models.ForeignKey(GRC, on_delete=models.PROTECT, related_name='division')
@@ -25,3 +31,6 @@ class Division(models.Model):
 
     class Meta:
         unique_together = ['grc', 'division_name']
+
+    def __str__(self):
+        return self.division_name
