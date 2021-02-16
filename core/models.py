@@ -6,20 +6,33 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db.models import Count, Case, When, IntegerField
 
+from department.models import Division, UserDepartment, GRC
+
 
 class UserManager(BaseUserManager):
-    def admin_create_user(self, username, grc, regional_office, department, soeId, password=None):
+    def admin_create_user(self, username, grc, user_department, division, soeId, password=None):
         """
         Creates and saves a User with the given username, date of birth, department, soeId and password.
         """
         if not username:
             raise ValueError('Users must have an username')
 
+        user_department_obj = UserDepartment.objects.filter(department_name=user_department).first()
+        if not user_department_obj:
+            raise ValueError('Users department does not exists')
+        grc_obj = GRC.objects.filter(user_department=user_department_obj, grc_name=grc).first()
+        if not grc_obj:
+            raise ValueError('GRC does not exists')
+        division_obj = Division.objects.filter(grc=grc_obj, division_name=division).first()
+        if not division_obj:
+            raise ValueError('Division does not exists')
+
         user = self.model(
             username=username,
-            grc=grc,
-            regional_office=regional_office,
-            department=department,
+            # grc=grc,
+            # regional_office=regional_office,
+            # department=department,
+            division=division_obj,
             soeId=soeId,
             # profile_pic=profile_pic
         )
@@ -30,15 +43,25 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, grc=None, regional_office=None, department='Admin', soeId='999', email=None, password=None):
+    def create_superuser(self, username, grc=None, division=None, user_department=None, soeId='999', email=None,
+                         password=None):
         """
-        Creates and saves a superuser with the given username, date of birth, department, soeId and password.
+        Creates and saves a superuser with the given username, department, soeId and password.
         """
+        division_obj = None
+
+        user_department_obj = UserDepartment.objects.filter(department_name=user_department).first()
+        if user_department_obj:
+            grc_obj = GRC.objects.filter(user_department=user_department_obj, grc_name=grc).first()
+            if grc_obj:
+                division_obj = Division.objects.filter(grc=grc_obj, division_name=division).first()
+
         user = self.model(
             username=username,
-            grc=grc,
-            regional_office=regional_office,
-            department=department,
+            division=division_obj,
+            # grc=grc,
+            # regional_office=regional_office,
+            # department=department,
             soeId=soeId,
             password=password,
             email=email
@@ -69,10 +92,11 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     # profile_pic = models.ImageField(upload_to='upload/profile-pic', default=None)
     soeId = models.CharField(max_length=50, blank=True)
-    department = models.CharField(max_length=100, blank=True)
+    # department = models.CharField(max_length=100, blank=True)
     mac_id = models.TextField(default="")
-    grc = models.CharField(max_length=256, blank=True)
-    regional_office = models.CharField(max_length=256, blank=True)
+    division = models.ForeignKey(Division, on_delete=models.PROTECT, related_name='user', blank=True, null=True)
+    # grc = models.CharField(max_length=256, blank=True)
+    # regional_office = models.CharField(max_length=256, blank=True)
 
     objects = UserManager()
 

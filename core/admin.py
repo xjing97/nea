@@ -10,11 +10,11 @@ class UserAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('username', 'soeId', 'grc', 'regional_office', 'department', 'mac_id', 'is_active')
-    list_filter = ('username', 'soeId', 'grc', 'regional_office', 'department')
+    list_display = ('username', 'soeId', 'division', 'mac_id', 'is_active')
+    list_filter = ('username', 'soeId', 'division')
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('soeId', 'grc', 'regional_office', 'department')}),
+        ('Personal info', {'fields': ('soeId', 'division__grc', 'division__grc__user_department', 'division')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
@@ -23,7 +23,7 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'soeId', 'grc', 'regional_office', 'department', 'password1', 'password2'),
+            'fields': ('username', 'soeId', 'division__grc', 'division__grc__user_department', 'division', 'password1', 'password2'),
         }),
     )
     search_fields = ('username',)

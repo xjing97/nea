@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'core',
     'module',
     'config',
-    'result'
+    'result',
+    'department'
 ]
 
 MIDDLEWARE = [

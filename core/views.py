@@ -106,9 +106,9 @@ def getUser(request):
     if user:
         res = Response(data={'data': {'user_id': user.id,
                                       'username': user.username,
-                                      'grc': user.grc,
-                                      'regional_office': user.regional_office,
-                                      'department': user.department,
+                                      'grc': user.division.grc.grc_name,
+                                      'division': user.division.division_name,
+                                      'department': user.division.grc.user_department.department_name,
                                       'soeId': user.soeId,
                                       }})
     else:
@@ -126,7 +126,8 @@ def getAllUsers(request):
     user = User.objects.filter(
         is_staff=False, is_active=True
     ).values(
-        'id', 'username', 'grc', 'regional_office', 'department', 'soeId'
+        'id', 'username', 'division__grc__grc_name', 'division__grc__user_department__department_name',
+        'division__division_name', 'soeId'
     )
     return Response(data={'data': list(user), 'message': 'Get all users successfully'})
 

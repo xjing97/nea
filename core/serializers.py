@@ -8,14 +8,15 @@ from typing import MutableMapping
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 from core.models import User
+from department.models import Division, UserDepartment, GRC
 
 
 class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=256, required=True)
     grc = serializers.CharField(max_length=256, required=False)
-    regional_office = serializers.CharField(max_length=256, required=False)
+    division = serializers.CharField(max_length=256, required=False)
+    user_department = serializers.CharField(max_length=256, required=True)
     soeId = serializers.CharField(max_length=256, required=False)
-    department = serializers.CharField(max_length=256, required=True)
     # profile_pic = serializers.ImageField(allow_null=True, required=False)
     # password = serializers.CharField(max_length=256, required=True)
 
@@ -29,8 +30,21 @@ class SignUpSerializer(serializers.Serializer):
             raise serializers.ValidationError({'soeId': 'Soe ID is required'}, code='invalid')
         if not data.get('grc'):
             raise serializers.ValidationError({'grc': 'GRC is required'}, code='invalid')
-        if not data.get('regional_office'):
+        if not data.get('division'):
             raise serializers.ValidationError({'regional_office': 'Regional Office is required'}, code='invalid')
+        if not data.get('user_department'):
+            raise serializers.ValidationError({'user_department': 'User department is required'}, code='invalid')
+
+
+        user_department_obj = UserDepartment.objects.filter(department_name=data.get('user_department')).first()
+        if not user_department_obj:
+            raise ValueError('Users department does not exists')
+        grc_obj = GRC.objects.filter(user_department=user_department_obj, grc_name=data.get('grc')).first()
+        if not grc_obj:
+            raise ValueError('GRC does not exists')
+        division_obj = Division.objects.filter(grc=grc_obj, division_name=data.get('division')).first()
+        if not division_obj:
+            raise ValueError('Division does not exists')
 
         return data
 
@@ -38,7 +52,6 @@ class SignUpSerializer(serializers.Serializer):
         with transaction.atomic():
             print(self.validated_data)
             user = User.objects.admin_create_user(**self.validated_data)
-                
         return JsonResponse(data={'data': {'user_id': user.id}, 'message': "User creation success"})
 
 
@@ -95,10 +108,11 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.Serializer):
     user_id = serializers.IntegerField(required=True)
     username = serializers.CharField(max_length=256, required=True)
-    grc = serializers.CharField(max_length=256, required=True)
-    regional_office = serializers.CharField(max_length=256, required=True)
+    # grc = serializers.CharField(max_length=256, required=True)
+    # regional_office = serializers.CharField(max_length=256, required=True)
     soeId = serializers.CharField(max_length=256, required=True)
-    department = serializers.CharField(max_length=256, required=True)
+    # department = serializers.CharField(max_length=256, required=True)
+    division = serializers.CharField(max_length=256, required=True)
     # password = serializers.CharField(max_length=256, required=True)
 
     def validate(self, data: MutableMapping[str, str]):
@@ -112,19 +126,20 @@ class UserSerializer(serializers.Serializer):
     def update(self):
         user_id = self.validated_data['user_id']
         user = User.objects.filter(id=user_id).first()
+        division = Division.objects.filter(id=self.validated_data['division']).first()
         with transaction.atomic():
             if user:
                 user.username = self.validated_data['username']
-                user.grc = self.validated_data['grc']
-                user.regional_office = self.validated_data['regional_office']
+                # user.grc = self.validated_data['grc']
+                # user.regional_office = self.validated_data['regional_office']
                 user.soeId = self.validated_data['soeId']
-                user.department = self.validated_data['department']
+                # user.department = self.validated_data['department']
+                user.division = division
                 # user.password = self.validated_data['password']
                 user.save()
 
                 return JsonResponse(data={'data': {'user_id': user.id, 'username': user.username, 'soeId': user.soeId,
-                                                   'department': user.department, 'grc': user.grc,
-                                                   'regional_office': user.regional_office},
+                                                   'division': user.division.division_name},
                                           'message': "Updated user successfully"})
 
             else:
