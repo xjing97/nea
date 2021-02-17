@@ -23,4 +23,5 @@ urlpatterns = [
     path('result/', include('result.urls', namespace='result')),
     path('modules/', include('module.urls', namespace='module')),
     path('config/', include('config.urls', namespace='config')),
+    path('department/', include('department.urls', namespace='department')),
 ]
