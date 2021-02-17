@@ -14,7 +14,7 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ('username', 'soeId', 'division')
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('soeId', 'division__grc', 'division__grc__user_department', 'division')}),
+        ('Personal info', {'fields': ('soeId', 'division')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
@@ -23,7 +23,7 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'soeId', 'division__grc', 'division__grc__user_department', 'division', 'password1', 'password2'),
+            'fields': ('username', 'soeId', 'division', 'password1', 'password2'),
         }),
     )
     search_fields = ('username',)
