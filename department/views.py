@@ -53,7 +53,7 @@ def edit_user_department(request):
     if not user_department:
         return Response(status=400, data='User department does not exist')
 
-    user_department.name = user_department_name
+    user_department.department_name = user_department_name
     user_department.save()
 
     return Response(data={'user_department_name': user_department.department_name,
@@ -95,7 +95,7 @@ def get_grc(request):
     grc = GRC.objects.filter(id=grc_id).first()
 
     if not grc:
-        return Response(status=400, data='User department does not exists')
+        return Response(status=400, data='GRC does not exists')
 
     user_departments = UserDepartment.objects.values('id', 'department_name')
 
@@ -141,7 +141,7 @@ def edit_grc(request):
     if not user_department:
         return Response(status=400, data='User department does not exist')
 
-    grc.name = grc_name
+    grc.grc_name = grc_name
     grc.user_department = user_department
     grc.save()
 
@@ -163,7 +163,83 @@ def get_division_by_grc(request):
 
     divisions = Division.objects.filter(grc_id=grc_id).values('id', 'division_name')
 
-    return Response(data={'data': {'divisions': list(divisions), 'grc_id': grc.id, 'grc_name': grc.name,
+    return Response(data={'data': {'divisions': list(divisions), 'grc_id': grc.id, 'grc_name': grc.grc_name,
                                    'user_department_name': grc.user_department.department_name,
                                    'user_department_id': grc.user_department.id}})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_division(request):
+    division_id = request.GET.get('division_id', '')
+    division = Division.objects.filter(id=division_id).first()
+
+    if not division:
+        return Response(status=400, data='Division does not exists')
+
+    user_departments = UserDepartment.objects.values('id', 'department_name')
+    grcs = GRC.objects.values('id', 'grc_name')
+
+    return Response(data={'user_departments': list(user_departments),
+                          'user_department_id': division.grc.user_department.id,
+                          'grcs': list(grcs),
+                          'grc_name': division.grc.grc_name,
+                          'grc_id': division.grc.id,
+                          'division_id': division.id,
+                          'division_name': division.division_name,
+                          })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_division(request):
+    division_name = request.data.get('name', '')
+    grc_id = request.data.get('grc_id', '')
+    user_department_id = request.data.get('user_department_id', '')
+
+    if not division_name:
+        return Response(status=400, data='Division name is required')
+
+    if not user_department_id:
+        return Response(status=400, data='User Department is required')
+
+    if not grc_id:
+        return Response(status=400, data='GRC is required')
+
+    division, created = Division.objects.get_or_create(division_name=division_name, grc_id=grc_id)
+
+    if not created:
+        return Response(status=400, data='%s already exists' % division.division_name)
+
+    return Response(data={'division_name': division.division_name, 'division_id': division.id})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def edit_division(request):
+    division_id = request.data.get('id', '')
+    division_name = request.data.get('name', '')
+    grc_id = request.data.get('grc_id', '')
+    user_department_id = request.data.get('user_department_id', '')
+
+    division = Division.objects.filter(id=division_id).first()
+
+    if not division:
+        return Response(status=400, data='Division does not exist')
+
+    user_department = UserDepartment.objects.filter(id=user_department_id).first()
+
+    if not user_department:
+        return Response(status=400, data='User department does not exist')
+
+    grc = GRC.objects.filter(id=grc_id).first()
+
+    if not grc:
+        return Response(status=400, data='GRC does not exist')
+
+    division.division_name = division_name
+    division.grc = grc
+    # division.grc.user_department = user_department
+    division.save()
+
+    return Response(data={'division_name': division.division_name, 'division_id': division.id})
 
