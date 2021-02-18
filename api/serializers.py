@@ -17,6 +17,9 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError(["Password fields didn't match."])
 
+        if attrs['password'] == attrs['old_password']:
+            raise serializers.ValidationError(['New password must be different from old password.'])
+
         return attrs
 
     def validate_old_password(self, value):
