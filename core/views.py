@@ -147,8 +147,12 @@ def changeUserPassword(request):
     user_id = data['userId']
     new_password = data['newPassword']
     confirm_password = data['confirmPassword']
+
     if new_password != confirm_password:
         return Response(status=400, data={'message': {"confirmPassword": "Password fields didn't match."}})
+
+    if not new_password or not confirm_password:
+        return Response(status=400, data={'message': {'New password cannot be empty.'}})
 
     user = User.objects.filter(id=user_id).first()
     if not user:
