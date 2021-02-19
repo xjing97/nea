@@ -84,7 +84,8 @@ def get_all_results(request):
     result = Result.objects.filter(
         user__is_active=True
     ).values(
-        'id', 'user__username', 'user__department', 'user__soeId', 'user__grc', 'user__regional_office',
+        'id', 'user__username', 'user__soeId', 'user__division__grc__grc_name',
+        'user__division__division_name', 'user__division__grc__user_department__department_name',
         'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
         'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated', 'audio', 'start_time', 'end_time',
         'breeding_points', 'breeding_points_not_found', 'breeding_points_found'
