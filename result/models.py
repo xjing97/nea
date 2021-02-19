@@ -21,10 +21,10 @@ class ResultManager(models.Manager):
         if group_by_department:
             results = Result.objects.filter(dateCreated__gte=prev_12_months, dateCreated__lt=next_month).annotate(
                 month=TruncMonth('dateCreated')
-            ).values('month', 'user__department').annotate(
+            ).values('month', 'user__division__grc__user_department__department_name').annotate(
                 total=Count('month')
             ).values(
-                'month', 'total', 'user__department'
+                'month', 'total', 'user__division__grc__user_department__department_name'
             )
         else:
             results = Result.objects.filter(dateCreated__gte=prev_12_months, dateCreated__lt=next_month).annotate(
@@ -56,10 +56,10 @@ class ResultManager(models.Manager):
         if group_by_department:
             results = Result.objects.filter(dateCreated__gte=from_date, dateCreated__lt=to_date).annotate(
                 month=TruncMonth('dateCreated')
-            ).values('month', 'user__department').annotate(
+            ).values('month', 'user__division__grc__user_department__department_name').annotate(
                 total=Count('month')
             ).values(
-                'month', 'total', 'user__department'
+                'month', 'total', 'user__division__grc__user_department__department_name'
             )
         else:
             results = Result.objects.filter(dateCreated__gte=from_date, dateCreated__lt=to_date).annotate(
@@ -85,10 +85,10 @@ class ResultManager(models.Manager):
         if group_by_department:
             results = Result.objects.filter(dateCreated__gte=month, dateCreated__lt=one_month).annotate(
                 date=TruncDate('dateCreated')
-            ).values('date', 'user__department').annotate(
+            ).values('date', 'user__division__grc__user_department__department_name').annotate(
                 total=Count('date')
             ).values(
-                'date', 'total', 'user__department'
+                'date', 'total', 'user__division__grc__user_department__department_name'
             )
         else:
             results = Result.objects.filter(dateCreated__gte=month, dateCreated__lt=one_month).annotate(
@@ -107,10 +107,10 @@ class ResultManager(models.Manager):
         if group_by_department:
             results = Result.objects.filter(dateCreated__gte=from_date, dateCreated__lt=to_date).annotate(
                 date=TruncDate('dateCreated')
-            ).values('date', 'user__department').annotate(
+            ).values('date', 'user__division__grc__user_department__department_name').annotate(
                 total=Count('date')
             ).values(
-                'date', 'total', 'user__department'
+                'date', 'total', 'user__division__grc__user_department__department_name'
             )
         else:
             results = Result.objects.filter(dateCreated__gte=from_date, dateCreated__lt=to_date).annotate(

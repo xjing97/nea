@@ -74,10 +74,12 @@ class UserManager(BaseUserManager):
     def get_total_users_by_department(self):
         users = User.objects.filter(
             is_staff=False, is_active=True
-        ).values('department').annotate(
-            total=Count('department'),
+        ).exclude(
+            division__grc__user_department__department_name='NA'
+        ).values('division__grc__user_department__department_name').annotate(
+            total=Count('division__grc__user_department__department_name'),
             active=Count(Case(When(last_login__isnull=False, then=1), output_field=IntegerField()))
-        ).values('department', 'total', 'active')
+        ).values('division__grc__user_department__department_name', 'total', 'active')
 
         return users
 
