@@ -8,12 +8,14 @@ from typing import MutableMapping
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 from core.models import User
-from department.models import Division
+from department.models import Division, GRC, UserDepartment
 
 
 class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=256, required=True)
     division = serializers.CharField(max_length=256, required=False)
+    grc = serializers.CharField(max_length=256, required=False)
+    department = serializers.CharField(max_length=256, required=False)
     soeId = serializers.CharField(max_length=256, required=False)
 
     def validate(self, data: MutableMapping[str, str]):
@@ -24,12 +26,36 @@ class SignUpSerializer(serializers.Serializer):
 
         if not data.get('soeId'):
             raise serializers.ValidationError({'soeId': 'Soe ID is required'}, code='invalid')
-        if not data.get('division'):
-            raise serializers.ValidationError({'regional_office': 'Regional Office is required'}, code='invalid')
 
-        division_obj = Division.objects.filter(id=data.get('division')).first()
-        if not division_obj:
-            raise ValueError('Division does not exists')
+        division = data.get('division')
+
+        if not division:
+            raise serializers.ValidationError({'division': 'Division is required'}, code='invalid')
+
+        grc = data.get('grc')
+        department = data.get('department')
+
+        if not grc and not department:
+            division_obj = Division.objects.filter(id=division).first()
+            if not division_obj:
+                raise serializers.ValidationError({'division': 'Division does not exists'}, code='invalid')
+        else:
+            if not grc:
+                raise serializers.ValidationError({'grc': 'GRC is required'}, code='invalid')
+            if not department:
+                raise serializers.ValidationError({'department': 'User Department is required'}, code='invalid')
+
+            department_obj = UserDepartment.objects.filter(department_name=department).first()
+            if not department_obj:
+                raise serializers.ValidationError({'department': 'User Department does not exists'}, code='invalid')
+
+            grc_obj = GRC.objects.filter(grc_name=grc, user_department=department_obj).first()
+            if not grc_obj:
+                raise serializers.ValidationError({'grc': 'GRC does not exists'}, code='invalid')
+
+            division_obj = Division.objects.filter(division_name=division, grc=grc_obj).first()
+            if not division_obj:
+                raise serializers.ValidationError({'division': 'Division does not exists'}, code='invalid')
 
         return data
 

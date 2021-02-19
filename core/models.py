@@ -10,14 +10,19 @@ from department.models import Division, UserDepartment, GRC
 
 
 class UserManager(BaseUserManager):
-    def admin_create_user(self, username, division, soeId, password=None):
+    def admin_create_user(self, username, division, soeId, password=None, grc=None, department=None):
         """
         Creates and saves a User with the given username, date of birth, department, soeId and password.
         """
         if not username:
             raise ValueError('Users must have an username')
 
-        division_obj = Division.objects.filter(id=division).first()
+        if grc and department:
+            grc_obj = GRC.objects.filter(grc_name=grc, user_department__department_name=department).first()
+            division_obj = Division.objects.filter(division_name=division, grc=grc_obj).first()
+        else:
+            division_obj = Division.objects.filter(id=division).first()
+
         if not division_obj:
             raise ValueError('Division does not exists')
 
