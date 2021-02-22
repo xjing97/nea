@@ -104,6 +104,33 @@ def get_all_results(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def get_result_details(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
+    result_id = request.GET.get('result_id', '')
+    if not result_id:
+        return Response(status=400, data={'message': 'Required argument result_id is missing'})
+
+    result = Result.objects.filter(
+        user__is_active=True, id=result_id
+    ).values(
+        'id', 'user__username', 'user__soeId', 'user__division__grc__grc_name',
+        'user__division__division_name', 'user__division__grc__user_department__department_name',
+        'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
+        'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated', 'audio', 'start_time', 'end_time',
+        'breeding_points', 'breeding_points_not_found', 'breeding_points_found', 'result_breakdown', 'teleport_path'
+    )
+    if not result:
+        return Response(status=400, data={'message': 'Result not found'})
+
+    return Response(status=200, data={'data': {'result': list(result)},
+                                      'message': 'Get result details successfully'})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_results_by_date(request):
     validator = ValidateIsAdmin()
     if not validator.validate(request.user.id):
