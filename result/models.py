@@ -162,6 +162,8 @@ class Result(models.Model):
     breeding_points = models.TextField(blank=True, null=True)
     breeding_points_found = models.TextField(blank=True, null=True)
     breeding_points_not_found = models.TextField(blank=True, null=True)
+    result_breakdown = models.TextField(blank=True, null=True)
+    teleport_path = models.TextField(blank=True, null=True)
     audio = models.FileField(upload_to='upload/audio', blank=True, null=True)
     dateCreated = models.DateTimeField(auto_now_add=True)
     dateUpdated = models.DateTimeField(auto_now=True)

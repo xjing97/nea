@@ -26,6 +26,7 @@ def store_result(request):
     data = request.data
 
     required_params_list = ('result', 'inspection_start', 'inspection_end', 'time_spend', 'mac_id', 'config_id',
+                            'result_breakdown', 'teleport_path',
                             'breeding_points_found', 'breeding_points_not_found', 'audio_file')
     for param_name in required_params_list:
         if param_name not in data:
@@ -40,6 +41,8 @@ def store_result(request):
     config_id = data['config_id']
     breeding_points_found = data['breeding_points_found']
     breeding_points_not_found = data['breeding_points_not_found']
+    result_breakdown = data['result_breakdown']
+    teleport_path = data['teleport_path']
     audio_file = data['audio_file']
 
     try:
@@ -68,6 +71,7 @@ def store_result(request):
                                        breeding_points_found=breeding_points_found,
                                        breeding_points_not_found=breeding_points_not_found,
                                        time_spend=time_spend, mac_id=mac_id, config=config_obj.config,
+                                       result_breakdown=result_breakdown, teleport_path=teleport_path,
                                        audio=audio_file)
         return Response(status=200, data={'result_id': result.id, 'message': 'Stored result successfully'})
     else:
