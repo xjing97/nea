@@ -116,7 +116,7 @@ def get_result_details(request):
     result = Result.objects.filter(
         user__is_active=True, id=result_id
     ).values(
-        'id', 'user__username', 'user__soeId', 'user__division__grc__grc_name',
+        'id', 'user__username', 'user__soeId', 'user__division__grc__grc_name', 'config',
         'user__division__division_name', 'user__division__grc__user_department__department_name',
         'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
         'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated', 'audio', 'start_time', 'end_time',
