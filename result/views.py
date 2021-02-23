@@ -26,8 +26,7 @@ def store_result(request):
     data = request.data
 
     required_params_list = ('result', 'inspection_start', 'inspection_end', 'time_spend', 'mac_id', 'config_id',
-                            'result_breakdown', 'teleport_path',
-                            'breeding_points_found', 'breeding_points_not_found', 'audio_file')
+                            'result_breakdown', 'teleport_path', 'audio_file')
     for param_name in required_params_list:
         if param_name not in data:
             return Response(status=400, data={'message': 'Required argument %s is missing' % param_name})
@@ -39,8 +38,9 @@ def store_result(request):
     time_spend_str = data['time_spend']  # format should be HH:mm:ss
     mac_id = data['mac_id']
     config_id = data['config_id']
-    breeding_points_found = data['breeding_points_found']
-    breeding_points_not_found = data['breeding_points_not_found']
+    breeding_points_found = data.get('breeding_points_found', '')
+    breeding_points_not_found = data.get('breeding_points_not_found', '')
+    critical_failure = data.get('critical_failure', '')
     result_breakdown = data['result_breakdown']
     teleport_path = data['teleport_path']
     audio_file = data['audio_file']
@@ -61,7 +61,7 @@ def store_result(request):
 
     scenario = config_obj.scenario
     passing_score = config_obj.passing_score
-    is_pass = True if float(result) > passing_score else False
+    is_pass = True if float(result) > passing_score and not critical_failure else False
 
     breeding_points = config_obj.breeding_point
 
@@ -72,6 +72,7 @@ def store_result(request):
                                        breeding_points_not_found=breeding_points_not_found,
                                        time_spend=time_spend, mac_id=mac_id, config=config_obj.config,
                                        result_breakdown=result_breakdown, teleport_path=teleport_path,
+                                       critical_failure=critical_failure,
                                        audio=audio_file)
         return Response(status=200, data={'result_id': result.id, 'message': 'Stored result successfully'})
     else:
@@ -92,7 +93,7 @@ def get_all_results(request):
         'user__division__division_name', 'user__division__grc__user_department__department_name',
         'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
         'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated', 'audio', 'start_time', 'end_time',
-        'breeding_points', 'breeding_points_not_found', 'breeding_points_found'
+        'breeding_points', 'breeding_points_not_found', 'breeding_points_found', 'critical_failure'
     ).order_by('-dateCreated')
 
     all_modules_scenarios = Module.objects.values('id', 'module_name', 'scenario__id', 'scenario__scenario_title')
