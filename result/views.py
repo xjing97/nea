@@ -91,6 +91,7 @@ def get_all_results(request):
     ).values(
         'id', 'user__username', 'user__soeId', 'user__division__grc__grc_name',
         'user__division__division_name', 'user__division__grc__user_department__department_name',
+        'user__division__grc__id', 'user__division__id', 'user__division__grc__user_department__id',
         'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
         'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated', 'audio', 'start_time', 'end_time',
         'breeding_points', 'breeding_points_not_found', 'breeding_points_found', 'critical_failure'
