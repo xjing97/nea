@@ -86,7 +86,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     # profile_pic = models.ImageField(upload_to='upload/profile-pic', default=None)
-    soeId = models.CharField(max_length=50, blank=True)
+    soeId = models.CharField(max_length=50, blank=True, unique=True)
     # department = models.CharField(max_length=100, blank=True)
     mac_id = models.TextField(default="")
     division = models.ForeignKey(Division, on_delete=models.PROTECT, related_name='user', blank=True, null=True)
