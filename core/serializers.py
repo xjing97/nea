@@ -22,10 +22,15 @@ class SignUpSerializer(serializers.Serializer):
         username = data.get('username')
         existing_user = User.objects.filter(username=username).first()
         if existing_user:
-            raise serializers.ValidationError({'username': 'Username is already taken'}, code='invalid')
+            raise serializers.ValidationError({'username': 'Invalid username. Username already exists'}, code='invalid')
 
-        if not data.get('soeId'):
-            raise serializers.ValidationError({'soeId': 'Soe ID is required'}, code='invalid')
+        soe_id = data.get('soeId')
+        if not soe_id:
+            raise serializers.ValidationError({'soeId': 'SOE ID is required'}, code='invalid')
+
+        duplicated_soe = User.objects.filter(soeId=soe_id).first()
+        if duplicated_soe:
+            raise serializers.ValidationError({'soeId': 'Invalid SOE ID. SOE ID already exists'}, code='invalid')
 
         division = data.get('division')
 
@@ -60,9 +65,13 @@ class SignUpSerializer(serializers.Serializer):
         return data
 
     def create_acc(self):
-        with transaction.atomic():
-            user = User.objects.admin_create_user(**self.validated_data)
-        return JsonResponse(data={'data': {'user_id': user.id}, 'message': "User creation success"})
+        try:
+            with transaction.atomic():
+                user = User.objects.admin_create_user(**self.validated_data)
+            return JsonResponse(data={'data': {'user_id': user.id}, 'message': "User creation success"})
+
+        except Exception as e:
+            return JsonResponse(status=400, data={'message': str(e)})
 
 
 class LoginSerializer(serializers.Serializer):
