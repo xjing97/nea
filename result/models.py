@@ -148,6 +148,16 @@ class ResultManager(models.Manager):
         ).values('passed', 'failed', 'scenario__module__module_name')
         return results
 
+    def group_result_status_by_scenario(self):
+        """
+        Show total pass and fail (group by scenario)
+        """
+        results = Result.objects.values('scenario').annotate(
+            passed=Count(Case(When(is_pass=True, then=1), output_field=IntegerField())),
+            failed=Count(Case(When(is_pass=False, then=1), output_field=IntegerField())),
+        ).values('passed', 'failed', 'scenario__module__module_name', 'scenario__scenario_title')
+        return results
+
 
 class Result(models.Model):
     scenario = models.ForeignKey(Scenario, on_delete=models.PROTECT)

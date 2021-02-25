@@ -4,6 +4,7 @@ from rest_framework.exceptions import ErrorDetail
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from module.models import Module
 from nea.decorators import permission_exempt, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
@@ -224,6 +225,12 @@ def userDashboard(request):
     department_active = User.objects.get_total_users_by_department()
     overall_pass_fail = Result.objects.get_total_result_status()
     module_pass_fail = Result.objects.group_result_status_by_module()
+    scenario_pass_fail = Result.objects.group_result_status_by_scenario()
+
+    modules = Module.objects.values_list('module_name', flat=True)
+
     return Response(data={'department_active': list(department_active),
                           'overall_pass_fail': overall_pass_fail,
+                          'modules': list(modules),
+                          'scenario_pass_fail': list(scenario_pass_fail),
                           'module_pass_fail': list(module_pass_fail)})
