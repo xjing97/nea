@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.db import models
-from django.db.models import Count, Case, When, IntegerField
+from django.db.models import Count, Case, When, IntegerField, Q
 from django.db.models.functions import TruncMonth, TruncDate
 from dateutil.relativedelta import relativedelta
 
@@ -128,11 +128,25 @@ class ResultManager(models.Manager):
 
         return results, dates
 
-    def get_total_result_status(self):
+    def get_total_result_status(self, from_date=None, to_date=None, filter_division='all', filter_grc='all',
+                                filter_department='all'):
         """
         Show total pass and fail
         """
-        results = Result.objects.aggregate(
+        q = Q()
+        if from_date:
+            q &= Q(dateCreated__gte=from_date)
+        if to_date:
+            q &= Q(dateCreated__lte=to_date)
+
+        if filter_division != 'all':
+            q &= Q(user__division__id=filter_division)
+        elif filter_grc != 'all':
+            q &= Q(user__division__grc__id=filter_grc)
+        elif filter_department != 'all':
+            q &= Q(user__division__grc__user_department__id=filter_department)
+
+        results = Result.objects.filter(q).aggregate(
             passed=Count(Case(When(is_pass=True, then=1), output_field=IntegerField())),
             failed=Count(Case(When(is_pass=False, then=1), output_field=IntegerField())),
         )

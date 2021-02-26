@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from dateutil.relativedelta import relativedelta
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -223,8 +224,21 @@ def userDashboard(request):
     if not validator.validate(request.user.id):
         return Response(status=403, data={'message': validator.error_message})
 
+    from_date_str = request.GET.get('fromDate', '')
+    to_date_str = request.GET.get('toDate', '')
+
+    filter_division = request.GET.get('filterDivision', 'all')
+    filter_grc = request.GET.get('filterGrc', 'all')
+    filter_department = request.GET.get('filterDepartment', 'all')
+
+    from_date = datetime.strptime(from_date_str, '%Y-%m-%d') if from_date_str else \
+        datetime(datetime.now().year, datetime.now().month, 1)
+    to_date = datetime.strptime(to_date_str, '%Y-%m-%d') + relativedelta(days=1) if to_date_str else datetime.now()
+
     department_user = UserDepartment.objects.get_total_users_by_user_department()
-    overall_pass_fail = Result.objects.get_total_result_status()
+
+    overall_pass_fail = Result.objects.get_total_result_status(from_date, to_date, filter_division, filter_grc,
+                                                               filter_department)
     module_pass_fail = Result.objects.group_result_status_by_module()
     scenario_pass_fail = Result.objects.group_result_status_by_scenario()
 
