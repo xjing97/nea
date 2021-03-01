@@ -152,21 +152,49 @@ class ResultManager(models.Manager):
         )
         return results
 
-    def group_result_status_by_module(self):
+    def group_result_status_by_module(self, from_date=None, to_date=None, filter_division='all', filter_grc='all',
+                                      filter_department='all'):
         """
         Show total pass and fail (group by module)
         """
-        results = Result.objects.values('scenario__module').annotate(
+        q = Q()
+        if from_date:
+            q &= Q(dateCreated__gte=from_date)
+        if to_date:
+            q &= Q(dateCreated__lte=to_date)
+
+        if filter_division != 'all':
+            q &= Q(user__division__id=filter_division)
+        elif filter_grc != 'all':
+            q &= Q(user__division__grc__id=filter_grc)
+        elif filter_department != 'all':
+            q &= Q(user__division__grc__user_department__id=filter_department)
+
+        results = Result.objects.filter(q).values('scenario__module').annotate(
             passed=Count(Case(When(is_pass=True, then=1), output_field=IntegerField())),
             failed=Count(Case(When(is_pass=False, then=1), output_field=IntegerField())),
         ).values('passed', 'failed', 'scenario__module__module_name')
         return results
 
-    def group_result_status_by_scenario(self):
+    def group_result_status_by_scenario(self, from_date=None, to_date=None, filter_division='all', filter_grc='all',
+                                        filter_department='all'):
         """
         Show total pass and fail (group by scenario)
         """
-        results = Result.objects.values('scenario').annotate(
+        q = Q()
+        if from_date:
+            q &= Q(dateCreated__gte=from_date)
+        if to_date:
+            q &= Q(dateCreated__lte=to_date)
+
+        if filter_division != 'all':
+            q &= Q(user__division__id=filter_division)
+        elif filter_grc != 'all':
+            q &= Q(user__division__grc__id=filter_grc)
+        elif filter_department != 'all':
+            q &= Q(user__division__grc__user_department__id=filter_department)
+
+        results = Result.objects.filter(q).values('scenario').annotate(
             passed=Count(Case(When(is_pass=True, then=1), output_field=IntegerField())),
             failed=Count(Case(When(is_pass=False, then=1), output_field=IntegerField())),
         ).values('passed', 'failed', 'scenario__module__module_name', 'scenario__scenario_title')

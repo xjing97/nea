@@ -239,8 +239,10 @@ def userDashboard(request):
 
     overall_pass_fail = Result.objects.get_total_result_status(from_date, to_date, filter_division, filter_grc,
                                                                filter_department)
-    module_pass_fail = Result.objects.group_result_status_by_module()
-    scenario_pass_fail = Result.objects.group_result_status_by_scenario()
+    module_pass_fail = Result.objects.group_result_status_by_module(from_date, to_date, filter_division, filter_grc,
+                                                                    filter_department)
+    scenario_pass_fail = Result.objects.group_result_status_by_scenario(from_date, to_date, filter_division, filter_grc,
+                                                                        filter_department)
 
     modules = Module.objects.values_list('module_name', flat=True)
 
