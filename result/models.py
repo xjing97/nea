@@ -211,6 +211,7 @@ class Result(models.Model):
     is_pass = models.BooleanField(blank=True, null=True)
     mac_id = models.CharField(max_length=256, default="")
     config = models.TextField(blank=True, null=True)
+    passing_score = models.DecimalField(blank=True, null=True, decimal_places=4, max_digits=12)
     breeding_points = models.TextField(blank=True, null=True)
     breeding_points_found = models.TextField(blank=True, null=True)
     breeding_points_not_found = models.TextField(blank=True, null=True)

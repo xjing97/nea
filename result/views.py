@@ -71,6 +71,7 @@ def store_result(request):
                                        breeding_points_found=breeding_points_found,
                                        breeding_points_not_found=breeding_points_not_found,
                                        time_spend=time_spend, mac_id=mac_id, config=config_obj.config,
+                                       passing_score=passing_score,
                                        result_breakdown=result_breakdown, teleport_path=teleport_path,
                                        critical_failure=critical_failure,
                                        audio=audio_file)
@@ -120,7 +121,7 @@ def get_result_details(request):
     ).values(
         'id', 'user__username', 'user__soeId', 'user__division__grc__grc_name', 'config', 'critical_failure',
         'user__division__grc__id', 'user__division__id', 'user__division__grc__user_department__id',
-        'user__division__division_name', 'user__division__grc__user_department__department_name',
+        'user__division__division_name', 'user__division__grc__user_department__department_name', 'passing_score',
         'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
         'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated', 'audio', 'start_time', 'end_time',
         'breeding_points', 'breeding_points_not_found', 'breeding_points_found', 'result_breakdown', 'teleport_path'
