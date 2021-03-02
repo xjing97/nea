@@ -95,7 +95,8 @@ def get_all_results(request):
         'user__division__grc__id', 'user__division__id', 'user__division__grc__user_department__id',
         'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
         'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated', 'audio', 'start_time', 'end_time',
-        'breeding_points', 'breeding_points_not_found', 'breeding_points_found', 'critical_failure'
+        'breeding_points', 'breeding_points_not_found', 'breeding_points_found', 'critical_failure', 'config',
+        'result_breakdown'
     ).order_by('-dateCreated')
 
     all_modules_scenarios = Module.objects.values('id', 'module_name', 'scenario__id', 'scenario__scenario_title')
