@@ -109,9 +109,12 @@ def getUser(request):
     if user:
         res = Response(data={'data': {'user_id': user.id,
                                       'username': user.username,
-                                      'grc': user.division.grc.grc_name,
-                                      'division': user.division.division_name,
-                                      'department': user.division.grc.user_department.department_name,
+                                      # 'grc': user.division.grc.grc_name,
+                                      # 'division': user.division.division_name,
+                                      # 'department': user.division.grc.user_department.department_name,
+                                      'grc': user.division.grc.id,
+                                      'division': user.division.id,
+                                      'department': user.division.grc.user_department.id,
                                       'soeId': user.soeId,
                                       }})
     else:
