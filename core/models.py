@@ -6,7 +6,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db.models import Count, Case, When, IntegerField
 
-from department.models import Division, UserDepartment, GRC
+from department.models import Division, GRC
 
 
 class UserManager(BaseUserManager):

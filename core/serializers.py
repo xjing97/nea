@@ -100,7 +100,7 @@ class LoginSerializer(serializers.Serializer):
 
         return data
 
-    def login(self):
+    def login(self, login_type='unity-api'):
         user = authenticate(**self.validated_data)
 
         first_time_login = False
@@ -118,9 +118,14 @@ class LoginSerializer(serializers.Serializer):
         user.save()
         token = RefreshToken.for_user(user)
 
+        if login_type == 'unity-api':
+            # So Unity side will not need to keep refreshing token
+            token.access_token.set_exp(lifetime=timedelta(days=1))
+
         data = {'refresh_token': str(token), 'access_token': str(token.access_token), 'user_id': user.id,
-                'user_name': user.username, 'expires_at': datetime.now() + RefreshToken.lifetime,
+                'user_name': user.username, 'expires_at': datetime.now() + token.lifetime,
                 'first_time_login': first_time_login}
+
         return JsonResponse(data={'data': data, 'message': 'Login successfully'})
 
 

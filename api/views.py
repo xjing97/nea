@@ -20,7 +20,7 @@ def login(request):
     form = LoginSerializer(data=request.data)
     if not form.is_valid():
         return Response(status=400, data=form.errors)
-    res = form.login()
+    res = form.login(login_type='unity-api')
     return res
 
 

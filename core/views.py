@@ -66,14 +66,13 @@ def mass_create_acc(request):
 def login(request):
     form = LoginSerializer(data=request.data)
     if not form.is_valid():
-        print(form.errors)
         return Response(status=400, data=form.errors)
-    print(form.validated_data['user_id'])
+
     validator = ValidateIsAdmin()
     if not validator.validate(form.validated_data['user_id']):
         return Response(status=403, data={'username': [ErrorDetail(string=validator.error_message, code='blank')]})
 
-    res = form.login()
+    res = form.login(login_type='admin-web-api')
     return res
 
 
