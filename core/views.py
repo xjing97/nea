@@ -201,10 +201,12 @@ def deleteUser(request):
     user = User.objects.filter(id=user_id).first()
 
     if user and user.is_active:
+        original_username = user.username
         user.is_active = False
+        user.username = original_username + str(datetime.now())
         user.save()
 
-        return Response(data={'username': user.username, 'message': "User '" + user.username + "' is deleted"})
+        return Response(data={'username': user.username, 'message': "User '" + original_username + "' is deleted"})
 
     else:
         return Response(status=400, data={'message': "User " + user.username + " not found"})
