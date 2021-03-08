@@ -240,7 +240,7 @@ def userDashboard(request):
         datetime(datetime.now().year, datetime.now().month, 1)
     to_date = datetime.strptime(to_date_str, '%Y-%m-%d') + relativedelta(days=1) if to_date_str else datetime.now()
 
-    department_user = UserDepartment.objects.get_total_users_by_user_department()
+    department_user = User.objects.get_total_users_by_user_department()
 
     overall_pass_fail = Result.objects.get_total_result_status(from_date, to_date, filter_division, filter_grc,
                                                                filter_department)

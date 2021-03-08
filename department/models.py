@@ -1,16 +1,8 @@
 from django.db import models
-from django.db.models import Count
 
 
 class UserDepartmentManager(models.Manager):
-    def get_total_users_by_user_department(self):
-        users = UserDepartment.objects.exclude(
-            department_name='NA', grc__division__user__is_staff=True,
-        ).values('department_name').annotate(
-            total=Count('grc__division__user__username')
-        ).values('department_name', 'total')
-
-        return users
+    pass
 
 
 class UserDepartment(models.Model):

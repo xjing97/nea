@@ -1,10 +1,9 @@
 from django.contrib.auth.base_user import BaseUserManager
-from django.db import models
 
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.db.models import Count, Case, When, IntegerField
+from django.db.models import Count, F
 
 from department.models import Division, GRC
 
@@ -71,15 +70,16 @@ class UserManager(BaseUserManager):
 
         return users
 
-    def get_total_users_by_department(self):
+    def get_total_users_by_user_department(self):
         users = User.objects.filter(
             is_staff=False, is_active=True
         ).exclude(
             division__grc__user_department__department_name='NA'
         ).values('division__grc__user_department__department_name').annotate(
+            department_name=F('division__grc__user_department__department_name'),
             total=Count('division__grc__user_department__department_name'),
-            active=Count(Case(When(last_login__isnull=False, then=1), output_field=IntegerField()))
-        ).values('division__grc__user_department__department_name', 'total', 'active')
+            # active=Count(Case(When(last_login__isnull=False, then=1), output_field=IntegerField()))
+        ).values('department_name', 'total')
 
         return users
 
