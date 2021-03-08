@@ -165,6 +165,7 @@ def changeUserPassword(request):
         return Response(status=400, data={'message': {"userId": "User not found"}})
 
     user.set_password(new_password)
+    user.last_login = None
     user.save()
 
     return Response(data={'username': user.username, 'message': 'Reset password successfully.'})
