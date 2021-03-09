@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from django.shortcuts import render
 
 # Create your views here.
+from pytz import timezone
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -48,8 +49,8 @@ def store_result(request):
     try:
         dt = datetime.strptime(time_spend_str, '%H:%M:%S')
         time_spend = timedelta(hours=dt.hour, minutes=dt.minute, seconds=dt.second)
-        start_time = datetime.strptime(start_time_str, '%d/%m/%Y %H:%M:%S')
-        end_time = datetime.strptime(end_time_str, '%d/%m/%Y %H:%M:%S')
+        start_time = timezone('Asia/Singapore').localize(datetime.strptime(start_time_str, '%d/%m/%Y %H:%M:%S'))
+        end_time = timezone('Asia/Singapore').localize(datetime.strptime(end_time_str, '%d/%m/%Y %H:%M:%S'))
 
     except Exception as e:
         return Response(status=400, data={'message': str(e)})
