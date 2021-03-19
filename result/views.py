@@ -41,7 +41,7 @@ def store_result(request):
     config_id = data['config_id']
     breeding_points_found = data.get('breeding_points_found', '')
     breeding_points_not_found = data.get('breeding_points_not_found', '')
-    critical_failure = data.get('critical_failure', '')
+    critical_failure = data.get('critical_failure', None)
     result_breakdown = data['result_breakdown']
     teleport_path = data['teleport_path']
     audio_file = data['audio_file']
@@ -165,3 +165,30 @@ def get_results_by_date(request):
                                                                      group_by_department=True)
 
     return Response(status=200, data={'data': result, 'x_axis': x_axis, 'message': 'Success'})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_critical_failure(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
+    from_date_str = request.GET.get('fromDate', '')
+    to_date_str = request.GET.get('toDate', '')
+
+    filter_division = request.GET.get('filterDivision', 'all')
+    filter_grc = request.GET.get('filterGrc', 'all')
+    filter_department = request.GET.get('filterDepartment', 'all')
+
+    data_type = request.GET.get('dataType', None)
+    filter_title = request.GET.get('filterTitle', None)
+
+    from_date = datetime.strptime(from_date_str, '%Y-%m-%d') if from_date_str else \
+        datetime(datetime.now().year, datetime.now().month, 1)
+    to_date = datetime.strptime(to_date_str, '%Y-%m-%d') + relativedelta(days=1) if to_date_str else datetime.now()
+
+    critical_failure_overview = Result.objects.get_critical_failure(from_date, to_date, filter_division, filter_grc,
+                                                           filter_department, data_type, filter_title)
+
+    return Response(status=200, data={'overview': critical_failure_overview, 'message': 'Success'})

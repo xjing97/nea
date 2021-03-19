@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.db import models
-from django.db.models import Count, Case, When, IntegerField, Q
+from django.db.models import Count, Case, When, IntegerField, Q, Value, F
 from django.db.models.functions import TruncMonth, TruncDate
 from dateutil.relativedelta import relativedelta
 
@@ -133,7 +133,7 @@ class ResultManager(models.Manager):
         """
         Show total pass and fail
         """
-        q = Q()
+        q = Q(user__is_active=True)
         if from_date:
             q &= Q(dateCreated__gte=from_date)
         if to_date:
@@ -157,7 +157,7 @@ class ResultManager(models.Manager):
         """
         Show total pass and fail (group by module)
         """
-        q = Q()
+        q = Q(user__is_active=True)
         if from_date:
             q &= Q(dateCreated__gte=from_date)
         if to_date:
@@ -181,7 +181,7 @@ class ResultManager(models.Manager):
         """
         Show total pass and fail (group by scenario)
         """
-        q = Q()
+        q = Q(user__is_active=True)
         if from_date:
             q &= Q(dateCreated__gte=from_date)
         if to_date:
@@ -198,6 +198,42 @@ class ResultManager(models.Manager):
             passed=Count(Case(When(is_pass=True, then=1), output_field=IntegerField())),
             failed=Count(Case(When(is_pass=False, then=1), output_field=IntegerField())),
         ).values('passed', 'failed', 'scenario__module__module_name', 'scenario__scenario_title')
+        return results
+
+    def get_critical_failure(self, from_date=None, to_date=None, filter_division='all', filter_grc='all',
+                             filter_department='all', data_type=None, filter_title=None):
+        """
+        Show total pass and fail (group by scenario)
+        """
+        q = Q(user__is_active=True)
+        if from_date:
+            q &= Q(dateCreated__gte=from_date)
+        if to_date:
+            q &= Q(dateCreated__lte=to_date)
+
+        if filter_division != 'all':
+            q &= Q(user__division__id=filter_division)
+        elif filter_grc != 'all':
+            q &= Q(user__division__grc__id=filter_grc)
+        elif filter_department != 'all':
+            q &= Q(user__division__grc__user_department__id=filter_department)
+
+        if data_type and filter_title:
+            q &= Q(is_pass=False)
+
+            if data_type == 'Modules':
+                q &= Q(scenario__module__module_name=filter_title)
+            elif data_type == 'Scenarios':
+                q &= Q(scenario__scenario_title=filter_title)
+
+        results = Result.objects.filter(q).values(
+            'critical_failure'
+        ).annotate(
+            failure=Case(When(Q(critical_failure__isnull=True) | Q(critical_failure=""), then=Value('Other')),
+                         default=F('critical_failure')),
+            count=Count(F('failure'))
+        ).values('failure', 'count')
+
         return results
 
 
