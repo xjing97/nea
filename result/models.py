@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 from django.db import models
@@ -201,11 +202,13 @@ class ResultManager(models.Manager):
         return results
 
     def get_critical_failure(self, from_date=None, to_date=None, filter_division='all', filter_grc='all',
-                             filter_department='all', data_type=None, filter_title=None):
+                             filter_department='all', filter_title=None):
         """
         Show total pass and fail (group by scenario)
         """
         q = Q(user__is_active=True)
+        q &= Q(is_pass=False)
+
         if from_date:
             q &= Q(dateCreated__gte=from_date)
         if to_date:
@@ -218,13 +221,8 @@ class ResultManager(models.Manager):
         elif filter_department != 'all':
             q &= Q(user__division__grc__user_department__id=filter_department)
 
-        if data_type and filter_title:
-            q &= Q(is_pass=False)
-
-            if data_type == 'Modules':
-                q &= Q(scenario__module__module_name=filter_title)
-            elif data_type == 'Scenarios':
-                q &= Q(scenario__scenario_title=filter_title)
+        if filter_title:
+            q &= Q(scenario__scenario_title=filter_title)
 
         overview = Result.objects.filter(q).values(
             'critical_failure'
@@ -234,13 +232,34 @@ class ResultManager(models.Manager):
             count=Count(F('failure'))
         ).values('failure', 'count')
 
+        failure_dict = {}
+
+        failure_list = list(Result.objects.filter(q).filter(critical_failure__isnull=False).exclude(
+            critical_failure=""
+        ).values_list('critical_failure', flat=True))
+
+        scenario = Scenario.objects.filter(scenario_title=filter_title).first()
+        config = json.loads(scenario.default_config) if scenario.default_config else None
+
+        if config:
+            scrips_list = config['Scenario']
+            if scrips_list:
+                for script in scrips_list:
+                    events = script["Events"]
+                    if events:
+                        for event in events:
+                            if event["Event_ID"] in failure_list:
+                                failure_dict[event["Event_ID"]] = event["Hint"]
+
+        print(failure_list)
+        print(failure_dict)
         details = Result.objects.filter(q).annotate(
             user_department=F('user__division__grc__user_department__department_name'),
             grc=F('user__division__grc__grc_name'),
             division=F('user__division__division_name'),
         ).values('id', 'user_department', 'grc', 'division', 'results', 'critical_failure', 'dateCreated')
 
-        return overview, details
+        return overview, details, failure_dict
 
 
 class Result(models.Model):
