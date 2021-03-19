@@ -184,11 +184,19 @@ def get_critical_failure(request):
     data_type = request.GET.get('dataType', None)
     filter_title = request.GET.get('filterTitle', None)
 
-    from_date = datetime.strptime(from_date_str, '%Y-%m-%d') if from_date_str else \
-        datetime(datetime.now().year, datetime.now().month, 1)
-    to_date = datetime.strptime(to_date_str, '%Y-%m-%d') + relativedelta(days=1) if to_date_str else datetime.now()
+    try:
+        from_date = datetime.strptime(from_date_str, '%Y-%m-%d') if from_date_str else \
+            datetime(datetime.now().year, datetime.now().month, 1)
+        to_date = datetime.strptime(to_date_str, '%Y-%m-%d') + relativedelta(days=1) if to_date_str else datetime.now()
 
-    critical_failure_overview = Result.objects.get_critical_failure(from_date, to_date, filter_division, filter_grc,
-                                                           filter_department, data_type, filter_title)
+        critical_failure_overview, critical_failure_details = Result.objects.get_critical_failure(from_date, to_date,
+                                                                                                  filter_division,
+                                                                                                  filter_grc,
+                                                                                                  filter_department,
+                                                                                                  data_type,
+                                                                                                  filter_title)
+    except Exception as e:
+        return Response(status=400, data={'message': str(e)})
 
-    return Response(status=200, data={'overview': critical_failure_overview, 'message': 'Success'})
+    return Response(status=200, data={'overview': critical_failure_overview, 'details': list(critical_failure_details),
+                                      'message': 'Success'})

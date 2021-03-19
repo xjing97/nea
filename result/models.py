@@ -226,7 +226,7 @@ class ResultManager(models.Manager):
             elif data_type == 'Scenarios':
                 q &= Q(scenario__scenario_title=filter_title)
 
-        results = Result.objects.filter(q).values(
+        overview = Result.objects.filter(q).values(
             'critical_failure'
         ).annotate(
             failure=Case(When(Q(critical_failure__isnull=True) | Q(critical_failure=""), then=Value('Other')),
@@ -234,7 +234,13 @@ class ResultManager(models.Manager):
             count=Count(F('failure'))
         ).values('failure', 'count')
 
-        return results
+        details = Result.objects.filter(q).annotate(
+            user_department=F('user__division__grc__user_department__department_name'),
+            grc=F('user__division__grc__grc_name'),
+            division=F('user__division__division_name'),
+        ).values('id', 'user_department', 'grc', 'division', 'results', 'critical_failure', 'dateCreated')
+
+        return overview, details
 
 
 class Result(models.Model):
