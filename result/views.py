@@ -76,7 +76,7 @@ def store_result(request):
                                        result_breakdown=result_breakdown, teleport_path=teleport_path,
                                        critical_failure=critical_failure,
                                        audio=audio_file)
-        return Response(status=200, data={'result_id': result.id, 'message': 'Stored result successfully'})
+        return Response(status=200, data={'result_id': result.uid, 'message': 'Stored result successfully'})
     else:
         return Response(status=400, data={'message': 'Scenario ID is invalid'})
 
@@ -91,7 +91,7 @@ def get_all_results(request):
     result = Result.objects.filter(
         user__is_active=True
     ).values(
-        'id', 'user__username', 'user__soeId', 'user__division__grc__grc_name',
+        'id', 'uid', 'user__username', 'user__soeId', 'user__division__grc__grc_name',
         'user__division__division_name', 'user__division__grc__user_department__department_name',
         'user__division__grc__id', 'user__division__id', 'user__division__grc__user_department__id',
         'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
@@ -119,9 +119,9 @@ def get_result_details(request):
         return Response(status=400, data={'message': 'Required argument result_id is missing'})
 
     result = Result.objects.filter(
-        user__is_active=True, id=result_id
+        user__is_active=True, uid=result_id
     ).values(
-        'id', 'user__username', 'user__soeId', 'user__division__grc__grc_name', 'config', 'critical_failure',
+        'id', 'uid', 'user__username', 'user__soeId', 'user__division__grc__grc_name', 'config', 'critical_failure',
         'user__division__grc__id', 'user__division__id', 'user__division__grc__user_department__id',
         'user__division__division_name', 'user__division__grc__user_department__department_name', 'passing_score',
         'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
@@ -189,11 +189,7 @@ def get_critical_failure(request):
         to_date = datetime.strptime(to_date_str, '%Y-%m-%d') + relativedelta(days=1) if to_date_str else datetime.now()
 
         critical_failure_overview, critical_failure_details, failure_dict = Result.objects.get_critical_failure(
-            from_date, to_date,
-            filter_division,
-            filter_grc,
-            filter_department,
-            filter_title)
+            from_date, to_date, filter_division, filter_grc, filter_department, filter_title)
 
     except Exception as e:
         return Response(status=400, data={'message': str(e)})
@@ -219,7 +215,7 @@ def update_result_breakdown(request):
     result_breakdown = data['resultBreakdown']
     scores = data.get('scores', None)
 
-    result = Result.objects.filter(id=result_id).first()
+    result = Result.objects.filter(uid=result_id).first()
     if not result:
         return Response(status=400, data={'message': 'Result not found'})
 

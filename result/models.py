@@ -1,4 +1,5 @@
 import json
+import uuid
 from datetime import datetime
 
 from django.db import models
@@ -251,18 +252,17 @@ class ResultManager(models.Manager):
                             if event["Event_ID"] in failure_list:
                                 failure_dict[event["Event_ID"]] = event["Hint"]
 
-        print(failure_list)
-        print(failure_dict)
         details = Result.objects.filter(q).annotate(
             user_department=F('user__division__grc__user_department__department_name'),
             grc=F('user__division__grc__grc_name'),
             division=F('user__division__division_name'),
-        ).values('id', 'user_department', 'grc', 'division', 'results', 'critical_failure', 'dateCreated')
+        ).values('id', 'uid', 'user_department', 'grc', 'division', 'results', 'critical_failure', 'dateCreated')
 
         return overview, details, failure_dict
 
 
 class Result(models.Model):
+    uid = models.CharField(unique=True, default=uuid.uuid4, max_length=256)
     scenario = models.ForeignKey(Scenario, on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     start_time = models.DateTimeField(null=True, blank=True)
@@ -286,7 +286,7 @@ class Result(models.Model):
     objects = ResultManager()
 
     def update_result_breakdown(self, result_breakdown, scores):
-        self.result_breakdown = result_breakdown
+        self.result_breakdown = json.dumps(result_breakdown)
         if scores:
             self.results = scores
             if not self.critical_failure:

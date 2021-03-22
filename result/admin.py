@@ -5,12 +5,12 @@ from .models import Result
 
 
 class ResultAdmin(admin.ModelAdmin):
-    list_display = ('scenario', 'user', 'time_spend', 'results', 'is_pass', 'critical_failure',
+    list_display = ('uid', 'scenario', 'user', 'time_spend', 'results', 'is_pass', 'critical_failure',
                     'dateCreated', 'dateUpdated')
-    list_filter = ('scenario', 'user', 'time_spend', 'results', 'is_pass', 'critical_failure',
+    list_filter = ('uid', 'scenario', 'user', 'time_spend', 'results', 'is_pass', 'critical_failure',
                    'dateCreated', 'dateUpdated')
-    search_fields = ('scenario__scenario_title', 'user__username', 'results', 'is_pass', 'critical_failure')
-    ordering = ('scenario__scenario_title',)
+    search_fields = ('uid', 'scenario__scenario_title', 'user__username', 'results', 'is_pass', 'critical_failure')
+    ordering = ('-dateCreated',)
     filter_horizontal = ()
 
 
