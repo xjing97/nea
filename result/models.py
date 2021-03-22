@@ -284,3 +284,16 @@ class Result(models.Model):
     dateUpdated = models.DateTimeField(auto_now=True)
 
     objects = ResultManager()
+
+    def update_result_breakdown(self, result_breakdown, scores):
+        self.result_breakdown = result_breakdown
+        if scores:
+            self.results = scores
+            if not self.critical_failure:
+                if scores >= self.passing_score:
+                    self.is_pass = False
+                else:
+                    self.is_pass = True
+            else:
+                self.is_pass = False
+        self.save()

@@ -201,3 +201,30 @@ def get_critical_failure(request):
     return Response(status=200, data={'overview': critical_failure_overview, 'details': list(critical_failure_details),
                                       'description': failure_dict,
                                       'message': 'Success'})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_result_breakdown(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
+    data = request.data
+    required_params_list = ('resultId', 'resultBreakdown')
+    for param_name in required_params_list:
+        if param_name not in data:
+            return Response(status=400, data={'message': 'Required argument %s is missing' % param_name})
+
+    result_id = data['resultId']
+    result_breakdown = data['resultBreakdown']
+    scores = data.get('scores', None)
+
+    result = Result.objects.filter(id=result_id).first()
+    if not result:
+        return Response(status=400, data={'message': 'Result not found'})
+
+    try:
+        result.update_result_breakdown(result_breakdown, scores)
+        return Response(status=200, data={'message': 'Success'})
+    except Exception as e:
+        return Response(status=400, data={'message': str(e)})
