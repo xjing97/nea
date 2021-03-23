@@ -40,3 +40,20 @@ class Division(models.Model):
 
     def __str__(self):
         return self.division_name
+
+    def delete_division(self):
+        if self.user.filter(is_active=True):
+            return "Failed to delete division. %s user(s) is assigned to this division" % \
+                   str(self.user.filter(is_active=True).count())
+
+        else:
+            try:
+                # removed inactive users' division
+                self.user.filter(is_active=False, division=self).update(division=None)
+
+                self.delete()
+
+                return None
+
+            except Exception as e:
+                return str(e)

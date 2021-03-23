@@ -243,3 +243,21 @@ def edit_division(request):
 
     return Response(data={'division_name': division.division_name, 'division_id': division.id})
 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def delete_division(request):
+    division_id = request.data.get('division_id', '')
+
+    division = Division.objects.filter(id=division_id).first()
+
+    if not division:
+        return Response(status=400, data='Division does not exist')
+
+    division_name = division.division_name
+    error_message = division.delete_division()
+
+    if error_message:
+        return Response(status=400, data=error_message)
+
+    return Response(data={'message': "Division '" + division_name + "' is deleted"})

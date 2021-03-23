@@ -1,8 +1,8 @@
 from django.urls import path, include
 
 from department.views import get_all_user_department, get_user_department, get_grc_by_department, get_division_by_grc, \
-    get_all_division, add_user_department, edit_user_department, get_grc, add_grc, edit_grc, get_division, add_division, \
-    edit_division
+    get_all_division, add_user_department, edit_user_department, get_grc, add_grc, edit_grc, get_division, \
+    add_division, edit_division, delete_division
 
 app_name = 'department'
 
@@ -20,4 +20,5 @@ urlpatterns = [
     path('get-division/', get_division, name='get_division'),
     path('add-division/', add_division, name='add_division'),
     path('edit-division/', edit_division, name='edit_division'),
+    path('delete-division/', delete_division, name='delete_division'),
 ]
