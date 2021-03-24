@@ -43,7 +43,7 @@ class ConfigManager(models.Manager):
                 default=Value(False), output_field=BooleanField()
             ),
         ).values(
-            'id', 'uid', 'config', 'module_name', 'building_type', 'cover_photo', 'description', 'level',
+            'id', 'config', 'module_name', 'building_type', 'cover_photo', 'description', 'level',
             'scenario_title', 'passing_score', 'user_can_attend', 'quiz_attempt', 'user_attempt'
         )
         return config
