@@ -26,13 +26,15 @@ def store_result(request):
     user = User.objects.filter(id=user_id).first()
     data = request.data
 
-    required_params_list = ('result', 'inspection_start', 'inspection_end', 'time_spend', 'mac_id', 'config_id',
-                            'result_breakdown', 'teleport_path', 'audio_file')
+    required_params_list = ('user_scores', 'total_scores', 'inspection_start', 'inspection_end', 'time_spend',
+                            'mac_id', 'config_id', 'result_breakdown', 'teleport_path', 'audio_file')
     for param_name in required_params_list:
         if param_name not in data:
             return Response(status=400, data={'message': 'Required argument %s is missing' % param_name})
 
-    result = data['result']
+    # result = data['result']
+    user_scores = Decimal(data['user_scores'])
+    total_scores = Decimal(data['total_scores'])
     # is_pass = True if data['is_pass'] == 'true' else False
     start_time_str = data['inspection_start']
     end_time_str = data['inspection_end']
@@ -64,12 +66,19 @@ def store_result(request):
 
     scenario = config_obj.scenario
     passing_score = config_obj.passing_score
-    is_pass = True if float(result) > passing_score and not critical_failure else False
+    result_percentage = user_scores / total_scores * 100
+
+    # Shouldn't do in this way, it should be fixed from unity side
+    if result_percentage > 100:
+        result_percentage = 100
+
+    is_pass = True if float(result_percentage) > passing_score and not critical_failure else False
 
     breeding_points = config_obj.breeding_point
 
     if scenario:
-        result = Result.objects.create(user=user, scenario=scenario, results=Decimal(result), is_pass=is_pass,
+        result = Result.objects.create(user=user, scenario=scenario, results=Decimal(result_percentage),
+                                       user_scores=user_scores, total_scores=total_scores, is_pass=is_pass,
                                        start_time=start_time, end_time=end_time, breeding_points=breeding_points,
                                        breeding_points_found=breeding_points_found,
                                        breeding_points_not_found=breeding_points_not_found,
@@ -127,9 +136,10 @@ def get_result_details(request):
         'id', 'uid', 'user__username', 'user__soeId', 'user__division__grc__grc_name', 'config', 'critical_failure',
         'user__division__grc__id', 'user__division__id', 'user__division__grc__user_department__id',
         'user__division__division_name', 'user__division__grc__user_department__department_name', 'passing_score',
-        'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
-        'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated', 'audio', 'start_time', 'end_time',
-        'breeding_points', 'breeding_points_not_found', 'breeding_points_found', 'result_breakdown', 'teleport_path'
+        'time_spend', 'results', 'is_pass', 'user_scores', 'total_scores', 'scenario_id', 'scenario__module_id',
+        'scenario__scenario_title', 'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated',
+        'audio', 'start_time', 'end_time', 'breeding_points', 'breeding_points_not_found', 'breeding_points_found',
+        'result_breakdown', 'teleport_path'
     )
     if not result:
         return Response(status=400, data={'message': 'Result not found'})

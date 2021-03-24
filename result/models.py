@@ -269,6 +269,8 @@ class Result(models.Model):
     end_time = models.DateTimeField(null=True, blank=True)
     time_spend = models.DurationField(blank=True, null=True)
     results = models.DecimalField(blank=True, null=True, decimal_places=4, max_digits=12)
+    user_scores = models.DecimalField(blank=True, null=True, decimal_places=4, max_digits=12)
+    total_scores = models.DecimalField(blank=True, null=True, decimal_places=4, max_digits=12)
     is_pass = models.BooleanField(blank=True, null=True)
     mac_id = models.CharField(max_length=256, default="")
     config = models.TextField(blank=True, null=True)
