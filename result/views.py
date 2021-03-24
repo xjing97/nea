@@ -53,11 +53,13 @@ def store_result(request):
         end_time = timezone('Asia/Singapore').localize(datetime.strptime(end_time_str, '%d/%m/%Y %H:%M:%S'))
 
     except Exception as e:
+        print(str(e))
         return Response(status=400, data={'message': str(e)})
 
     config_obj = Config.objects.filter(id=config_id).first()
 
     if not config_obj:
+        print('Config ID %s is invalid' % config_id)
         return Response(status=400, data={'message': 'Config ID is invalid'})
 
     scenario = config_obj.scenario
@@ -78,6 +80,7 @@ def store_result(request):
                                        audio=audio_file)
         return Response(status=200, data={'result_id': result.uid, 'message': 'Stored result successfully'})
     else:
+        print('Scenario is invalid')
         return Response(status=400, data={'message': 'Scenario ID is invalid'})
 
 
