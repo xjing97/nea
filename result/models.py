@@ -293,9 +293,9 @@ class Result(models.Model):
             self.results = scores
             if not self.critical_failure:
                 if scores >= self.passing_score:
-                    self.is_pass = False
-                else:
                     self.is_pass = True
+                else:
+                    self.is_pass = False
             else:
                 self.is_pass = False
         self.save()
