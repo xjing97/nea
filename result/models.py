@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime
 
 from django.db import models
-from django.db.models import Count, Case, When, IntegerField, Q, Value, F
+from django.db.models import Count, Case, When, IntegerField, Q, Value, F, Sum
 from django.db.models.functions import TruncMonth, TruncDate
 from dateutil.relativedelta import relativedelta
 
@@ -287,6 +287,9 @@ class Result(models.Model):
 
     objects = ResultManager()
 
+    def __str__(self):
+        return self.uid
+
     def update_result_breakdown(self, result_breakdown, scores):
         self.result_breakdown = json.dumps(result_breakdown)
         if scores:
@@ -299,3 +302,102 @@ class Result(models.Model):
             else:
                 self.is_pass = False
         self.save()
+
+    def get_event_info_from_config(self, event_id, scenario_id=None):
+        try:
+            scenario_config = json.loads(self.config)["Scenario"]
+            if scenario_config:
+                if scenario_id:
+                    scenario = next(filter(lambda x: x['Script_ID'] == scenario_id, scenario_config), None)
+
+                    if scenario:
+                        event = next(filter(lambda x: x['Event_ID'] == event_id, scenario['Events']), None)
+
+                        if event:
+                            scores = 0
+                            event_type = 'Action'
+                            keywords = []
+                            for action in event['Action']:
+                                scores += int(action['Score'] if 'Score' in action else 0)
+                                if action['Type'] == 'Speech':
+                                    event_type = 'Speech'
+                                    keywords.append(action['Keywords'])
+
+                            return {
+                                'scene_name': scenario['Scenario_Title'],
+                                'event_id': event['Event_ID'],
+                                'description': event['Hint'],
+                                'event_type': event_type,
+                                'event_keywords': keywords,
+                                'total_event_scores': scores,
+                                'is_critical_point': True if event['Is_Critical_Point'] == 'True' or event[
+                                    'Is_Critical_Point'] is True else False
+                            }
+                else:
+                    event = next(filter(lambda event: event['event'], map(lambda x: {
+                        'Scenario_Title': x['Scenario_Title'],
+                        'event': next(filter(lambda y: y['Event_ID'] == event_id, x['Events']), None)
+                    }, scenario_config)), None)
+
+                    if event:
+                        scores = 0
+                        event_type = 'Action'
+                        keywords = []
+                        for action in event['event']['Action']:
+                            scores += int(action['Score'] if 'Score' in action else 0)
+                            if action['Type'] == 'Speech':
+                                event_type = 'Speech'
+                                keywords.append(action['Keywords'])
+
+                        return {
+                            'scene_name': event['Scenario_Title'],
+                            'event_id': event['event']['Event_ID'],
+                            'description': event['event']['Hint'],
+                            'event_type': event_type,
+                            'event_keywords': keywords,
+                            'total_event_scores': scores,
+                            'is_critical_point': True if event['event']['Is_Critical_Point'] == 'True' or
+                                                         event['event']['Is_Critical_Point'] is True else False
+                        }
+
+            return None
+        except Exception as ex:
+            print(ex)
+            return None
+
+
+class ResultBreakdownManager(models.Manager):
+    def get_event_info_chart(self, scenario_id, critical_only=False):
+        q = Q()
+        if critical_only:
+            q &= Q(is_critical=True)
+
+        event_info = self.filter(q).filter(scenario_id=scenario_id).values('event_id').annotate(
+            event_pass=Sum(Case(When(event_is_pass=True, then=Value(1)), default=Value(0)), output_field=IntegerField()),
+            event_fail=Sum(Case(When(event_is_pass=False, then=Value(1)), default=Value(0)), output_field=IntegerField()),
+        ).values('event_id', 'event_pass', 'event_fail')
+        print(event_info)
+
+
+class ResultBreakdown(models.Model):
+    result = models.ForeignKey(Result, on_delete=models.PROTECT)
+    scenario = models.ForeignKey(Scenario, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    scene_name = models.CharField(max_length=256, default="")
+    event_id = models.CharField(max_length=256, default="")
+    event_type = models.CharField(max_length=256, default="")
+    description = models.CharField(max_length=256, default="")
+    event_keywords = models.CharField(max_length=256, default="")
+    action_performed = models.BooleanField(max_length=256, blank=True, null=True, default=None)
+    keywords_spoken = models.CharField(max_length=256, blank=True, null=True, default=None)
+    user_location = models.CharField(max_length=256, default="")
+    time_spent = models.DurationField(blank=True, null=True)
+    user_event_scores = models.DecimalField(blank=True, null=True, decimal_places=4, max_digits=12)
+    total_event_scores = models.DecimalField(blank=True, null=True, decimal_places=4, max_digits=12)
+    event_is_pass = models.BooleanField(blank=True, null=True, default=None)
+    is_critical = models.BooleanField(blank=True, null=True, default=None)
+    overall_is_pass = models.BooleanField(blank=True, null=True, default=None)
+    dateCreated = models.DateTimeField(auto_now_add=True)
+    dateUpdated = models.DateTimeField(auto_now=True)
+
+    objects = ResultBreakdownManager()
