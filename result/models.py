@@ -442,16 +442,37 @@ class Result(models.Model):
 
 
 class ResultBreakdownManager(models.Manager):
-    def get_event_info_chart(self, scenario_id, critical_only=False):
-        q = Q()
+    def get_event_analysis(self, from_date=None, to_date=None, filter_division='all', filter_grc='all',
+                           filter_department='all', filter_title=None, critical_only=False):
+        """
+        Show total pass and fail of each event (group by event id)
+        """
+        q = Q(user__is_active=True)
+
+        if from_date:
+            q &= Q(dateCreated__gte=from_date)
+        if to_date:
+            q &= Q(dateCreated__lte=to_date)
+
+        if filter_division != 'all':
+            q &= Q(user__division__id=filter_division)
+        elif filter_grc != 'all':
+            q &= Q(user__division__grc__id=filter_grc)
+        elif filter_department != 'all':
+            q &= Q(user__division__grc__user_department__id=filter_department)
+
+        if filter_title:
+            q &= Q(scenario__scenario_title=filter_title)
+
         if critical_only:
             q &= Q(is_critical=True)
 
-        event_info = self.filter(q).filter(scenario_id=scenario_id).values('event_id').annotate(
+        event_info = ResultBreakdown.objects.filter(q).values('event_id').annotate(
             event_pass=Sum(Case(When(event_is_pass=True, then=Value(1)), default=Value(0)), output_field=IntegerField()),
             event_fail=Sum(Case(When(event_is_pass=False, then=Value(1)), default=Value(0)), output_field=IntegerField()),
         ).values('event_id', 'event_pass', 'event_fail')
-        print(event_info)
+
+        return event_info
 
 
 class ResultBreakdown(models.Model):

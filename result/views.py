@@ -228,6 +228,38 @@ def get_critical_failure(request):
                                       'description': failure_dict,
                                       'message': 'Success'})
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_event_analysis(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
+    from_date_str = request.GET.get('fromDate', '')
+    to_date_str = request.GET.get('toDate', '')
+
+    filter_division = request.GET.get('filterDivision', 'all')
+    filter_grc = request.GET.get('filterGrc', 'all')
+    filter_department = request.GET.get('filterDepartment', 'all')
+
+    filter_title = request.GET.get('filterTitle', None)
+
+    try:
+        from_date = datetime.strptime(from_date_str, '%Y-%m-%d') if from_date_str else \
+            datetime(datetime.now().year, datetime.now().month, 1)
+        to_date = datetime.strptime(to_date_str, '%Y-%m-%d') + relativedelta(days=1) if to_date_str else datetime.now()
+
+        event_info = ResultBreakdown.objects.get_event_analysis(
+            from_date, to_date, filter_division, filter_grc, filter_department, filter_title)
+
+    except Exception as e:
+        return Response(status=400, data={'message': str(e)})
+
+    return Response(status=200, data={'event_info': event_info,
+                                      'message': 'Success'})
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_result_breakdown(request):
