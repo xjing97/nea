@@ -290,10 +290,18 @@ class Result(models.Model):
     def __str__(self):
         return self.uid
 
-    def update_result_breakdown(self, result_breakdown, scores):
-        self.result_breakdown = json.dumps(result_breakdown)
+    def update_result_breakdown(self, result_breakdown, scores, user_scores):
+        # self.result_breakdown = json.dumps(result_breakdown)
+        for breakdown in result_breakdown:
+            result_breakdown_obj = ResultBreakdown.objects.filter(
+                result__uid=self.uid, event_id=breakdown['event_id']
+            ).first()
+            result_breakdown_obj.user_event_scores = breakdown['user_event_scores']
+            result_breakdown_obj.save()
+
         if scores:
             self.results = scores
+            self.user_scores = user_scores
             if not self.critical_failure:
                 if scores >= self.passing_score:
                     self.is_pass = True
@@ -371,7 +379,7 @@ class Result(models.Model):
                                 'event_id': event['Event_ID'],
                                 'description': event['Hint'],
                                 'event_type': event_type,
-                                'event_keywords': keywords,
+                                'event_keywords': json.dumps(keywords),
                                 'total_event_scores': scores,
                                 'is_critical_point': True if event['Is_Critical_Point'] == 'True' or event[
                                     'Is_Critical_Point'] is True else False
@@ -397,7 +405,7 @@ class Result(models.Model):
                             'event_id': event['event']['Event_ID'],
                             'description': event['event']['Hint'],
                             'event_type': event_type,
-                            'event_keywords': keywords,
+                            'event_keywords': json.dumps(keywords),
                             'total_event_scores': scores,
                             'is_critical_point': True if event['event']['Is_Critical_Point'] == 'True' or
                                                          event['event']['Is_Critical_Point'] is True else False

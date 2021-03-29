@@ -16,7 +16,7 @@ from nea.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 
 from nea.validator import ValidateIsAdmin
-from .models import Result
+from .models import Result, ResultBreakdown
 
 
 @api_view(['POST'])
@@ -116,15 +116,9 @@ def get_all_results(request):
         'result_breakdown'
     ).order_by('-dateCreated')
 
-    result_details = Result.objects.filter(
+    result_details = ResultBreakdown.objects.filter(
         user__is_active=True
-    ).values(
-        'id', 'uid', 'resultbreakdown', 'dateCreated','user__division__grc__grc_name',
-        'user__division__division_name', 'user__division__grc__user_department__department_name',
-        'user__division__grc__id', 'user__division__id', 'user__division__grc__user_department__id',
-        'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
-        'scenario__module__module_name',
-    ).order_by('-dateCreated')
+    ).values()
 
     all_modules_scenarios = Module.objects.values('id', 'module_name', 'scenario__id', 'scenario__scenario_title')
 
@@ -156,10 +150,15 @@ def get_result_details(request):
         'audio', 'start_time', 'end_time', 'breeding_points', 'breeding_points_not_found', 'breeding_points_found',
         'result_breakdown', 'teleport_path'
     )
+
+    result_breakdown = ResultBreakdown.objects.filter(
+        user__is_active=True, result__uid=result_id
+    ).values()
+
     if not result:
         return Response(status=400, data={'message': 'Result not found'})
 
-    return Response(status=200, data={'data': {'result': list(result)},
+    return Response(status=200, data={'data': {'result': list(result), 'result_breakdown': list(result_breakdown)},
                                       'message': 'Get result details successfully'})
 
 
@@ -242,13 +241,14 @@ def update_result_breakdown(request):
     result_id = data['resultId']
     result_breakdown = data['resultBreakdown']
     scores = data.get('scores', None)
+    user_scores = data.get('userScores', None)
 
     result = Result.objects.filter(uid=result_id).first()
     if not result:
         return Response(status=400, data={'message': 'Result not found'})
 
     try:
-        result.update_result_breakdown(result_breakdown, scores)
+        result.update_result_breakdown(result_breakdown, scores, user_scores)
         return Response(status=200, data={'message': 'Success'})
     except Exception as e:
         return Response(status=400, data={'message': str(e)})

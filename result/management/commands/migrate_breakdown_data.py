@@ -84,7 +84,7 @@ class Command(BaseCommand):
                                 'event_id': event['Event_ID'],
                                 'description': event['Hint'],
                                 'event_type': event_type,
-                                'event_keywords': keywords,
+                                'event_keywords': json.dumps(keywords),
                                 'total_event_scores': scores,
                                 'is_critical_point': True if event['Is_Critical_Point'] == 'True' or event[
                                     'Is_Critical_Point'] is True else False
@@ -110,7 +110,7 @@ class Command(BaseCommand):
                             'event_id': event['event']['Event_ID'],
                             'description': event['event']['Hint'],
                             'event_type': event_type,
-                            'event_keywords': keywords,
+                            'event_keywords': json.dumps(keywords),
                             'total_event_scores': scores,
                             'is_critical_point': True if event['event']['Is_Critical_Point'] == 'True' or
                                                          event['event']['Is_Critical_Point'] is True else False
