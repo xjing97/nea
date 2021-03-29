@@ -48,6 +48,9 @@ def store_result(request):
     teleport_path = data['teleport_path']
     audio_file = data['audio_file']
 
+    if not critical_failure:
+        critical_failure = None
+
     try:
         dt = datetime.strptime(time_spend_str, '%H:%M:%S')
         time_spend = timedelta(hours=dt.hour, minutes=dt.minute, seconds=dt.second)
@@ -87,6 +90,7 @@ def store_result(request):
                                        result_breakdown=result_breakdown, teleport_path=teleport_path,
                                        critical_failure=critical_failure,
                                        audio=audio_file)
+        result.create_result_breakdown()
         return Response(status=200, data={'result_id': result.uid, 'message': 'Stored result successfully'})
     else:
         print('Scenario is invalid')
@@ -112,9 +116,20 @@ def get_all_results(request):
         'result_breakdown'
     ).order_by('-dateCreated')
 
+    result_details = Result.objects.filter(
+        user__is_active=True
+    ).values(
+        'id', 'uid', 'resultbreakdown', 'dateCreated','user__division__grc__grc_name',
+        'user__division__division_name', 'user__division__grc__user_department__department_name',
+        'user__division__grc__id', 'user__division__id', 'user__division__grc__user_department__id',
+        'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
+        'scenario__module__module_name',
+    ).order_by('-dateCreated')
+
     all_modules_scenarios = Module.objects.values('id', 'module_name', 'scenario__id', 'scenario__scenario_title')
 
     return Response(status=200, data={'data': {'results': list(result),
+                                               'result_details': list(result_details),
                                                'modules_scenarios': list(all_modules_scenarios)},
                                       'message': 'Get all results successfully'})
 

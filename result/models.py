@@ -1,6 +1,6 @@
 import json
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.db import models
 from django.db.models import Count, Case, When, IntegerField, Q, Value, F, Sum
@@ -302,6 +302,49 @@ class Result(models.Model):
             else:
                 self.is_pass = False
         self.save()
+        
+    def create_result_breakdown(self):
+        if self.result_breakdown:
+            breakdowns = json.loads(self.result_breakdown)
+            if breakdowns:
+                for breakdown in breakdowns:
+                    if self.config:
+                        event = self.get_event_info_from_config(breakdown['Event_ID'])
+
+                        if event:
+                            action_performed = None
+                            if breakdown['Action'] == 'True':
+                                action_performed = True
+                            elif breakdown['Action'] == 'False':
+                                action_performed = False
+
+                            keyword_spoken = None
+                            if breakdown['Speech'] != 'None':
+                                keyword_spoken = breakdown['Speech']
+
+                            try:
+                                dt = datetime.strptime(breakdown['Event_Time'], '%H:%M:%S')
+                                time_spent = timedelta(hours=dt.hour, minutes=dt.minute, seconds=dt.second)
+                            except Exception as ex:
+                                print(ex)
+                                time_spent = timedelta(hours=0, minutes=0, seconds=0)
+
+                            event_is_pass = True
+                            if event['total_event_scores'] and 'score' in breakdown:
+                                event_percentage = int(breakdown['score']) / event['total_event_scores'] * 100
+                                if event_percentage < self.passing_score:
+                                    event_is_pass = False
+
+                                ResultBreakdown.objects.create(
+                                    result=self, scenario=self.scenario, user=self.user,
+                                    scene_name=event['scene_name'], event_id=event['event_id'],
+                                    event_type=event['event_type'], description=event['description'],
+                                    event_keywords=event['event_keywords'], action_performed=action_performed,
+                                    keywords_spoken=keyword_spoken, user_location=breakdown['teleport_location'],
+                                    time_spent=time_spent, user_event_scores=int(breakdown['score']),
+                                    total_event_scores=event['total_event_scores'], event_is_pass=event_is_pass,
+                                    is_critical=event['is_critical_point'], overall_is_pass=self.is_pass
+                                )
 
     def get_event_info_from_config(self, event_id, scenario_id=None):
         try:
@@ -386,7 +429,7 @@ class ResultBreakdown(models.Model):
     scene_name = models.CharField(max_length=256, default="")
     event_id = models.CharField(max_length=256, default="")
     event_type = models.CharField(max_length=256, default="")
-    description = models.CharField(max_length=256, default="")
+    description = models.TextField(blank=True, null=True)
     event_keywords = models.CharField(max_length=256, default="")
     action_performed = models.BooleanField(max_length=256, blank=True, null=True, default=None)
     keywords_spoken = models.CharField(max_length=256, blank=True, null=True, default=None)
