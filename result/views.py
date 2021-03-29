@@ -118,7 +118,10 @@ def get_all_results(request):
 
     result_details = ResultBreakdown.objects.filter(
         user__is_active=True
-    ).values()
+    ).values('result__uid', 'scenario__module__module_name', 'scenario__scenario_title', 'scene_name', 'event_id',
+             'event_keywords', 'event_type', 'description', 'action_performed', 'keywords_spoken', 'user_event_scores',
+             'user_location', 'time_spent', 'total_event_scores', 'event_is_pass', 'is_critical', 'overall_is_pass',
+             'dateCreated', 'dateUpdated')
 
     all_modules_scenarios = Module.objects.values('id', 'module_name', 'scenario__id', 'scenario__scenario_title')
 
