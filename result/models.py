@@ -1,6 +1,7 @@
 import json
 import uuid
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 from django.db import models
 from django.db.models import Count, Case, When, IntegerField, Q, Value, F, Sum
@@ -296,7 +297,18 @@ class Result(models.Model):
             result_breakdown_obj = ResultBreakdown.objects.filter(
                 result__uid=self.uid, event_id=breakdown['event_id']
             ).first()
+
             result_breakdown_obj.user_event_scores = breakdown['user_event_scores']
+
+            score_percentage = Decimal(breakdown['user_event_scores']) / Decimal(result_breakdown_obj.total_event_scores) * 100
+
+            keyword_passing_score = self.get_keyword_passing_score()
+
+            if keyword_passing_score and score_percentage < keyword_passing_score:
+                result_breakdown_obj.event_is_pass = False
+            else:
+                result_breakdown_obj.event_is_pass = True
+
             result_breakdown_obj.save()
 
         if scores:
@@ -340,7 +352,8 @@ class Result(models.Model):
                             event_is_pass = True
                             if event['total_event_scores'] and 'score' in breakdown:
                                 event_percentage = int(breakdown['score']) / event['total_event_scores'] * 100
-                                if event_percentage < self.passing_score:
+                                keyword_passing_score = self.get_keyword_passing_score()
+                                if keyword_passing_score and event_percentage < keyword_passing_score:
                                     event_is_pass = False
 
                                 ResultBreakdown.objects.create(
@@ -415,6 +428,17 @@ class Result(models.Model):
         except Exception as ex:
             print(ex)
             return None
+
+    def get_keyword_passing_score(self):
+        if self.config:
+            config_json = json.loads(self.config)
+
+            if config_json:
+                init_config = config_json['Init']
+                if init_config:
+                    keyword_passing_score = init_config['Speech_Confident_Level_Pass_Level'] * 100
+                    return keyword_passing_score
+        return None
 
 
 class ResultBreakdownManager(models.Manager):

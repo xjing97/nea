@@ -45,7 +45,8 @@ class Command(BaseCommand):
                                 event_is_pass = True
                                 if event['total_event_scores'] and 'score' in breakdown:
                                     event_percentage = int(breakdown['score']) / event['total_event_scores'] * 100
-                                    if event_percentage < result.passing_score:
+                                    keyword_passing_score = self.get_keyword_passing_score(result)
+                                    if keyword_passing_score and event_percentage < keyword_passing_score:
                                         event_is_pass = False
 
                                     breakdown_obj = ResultBreakdown.objects.create(
@@ -120,3 +121,14 @@ class Command(BaseCommand):
         except Exception as ex:
             print(ex)
             return None
+
+    def get_keyword_passing_score(self, result):
+        if result.config:
+            config_json = json.loads(result.config)
+
+            if config_json:
+                init_config = config_json['Init']
+                if init_config:
+                    keyword_passing_score = init_config['Speech_Confident_Level_Pass_Level'] * 100
+                    return keyword_passing_score
+        return None
