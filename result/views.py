@@ -252,13 +252,21 @@ def get_event_analysis(request):
     else:
         show_crit_only = True
 
+    last_attempt_only_str = request.GET.get('lastAttemptOnly', 'false')
+
+    if last_attempt_only_str == 'false':
+        last_attempt_only = False
+    else:
+        last_attempt_only = True
+
     try:
         from_date = datetime.strptime(from_date_str, '%Y-%m-%d') if from_date_str else \
             datetime(datetime.now().year, datetime.now().month, 1)
         to_date = datetime.strptime(to_date_str, '%Y-%m-%d') + relativedelta(days=1) if to_date_str else datetime.now()
 
         event_info = ResultBreakdown.objects.get_event_analysis(
-            from_date, to_date, filter_division, filter_grc, filter_department, filter_title, show_crit_only)
+            from_date, to_date, filter_division, filter_grc, filter_department, filter_title, show_crit_only,
+            last_attempt_only)
 
     except Exception as e:
         return Response(status=400, data={'message': str(e)})

@@ -236,6 +236,13 @@ def userDashboard(request):
     filter_grc = request.GET.get('filterGrc', 'all')
     filter_department = request.GET.get('filterDepartment', 'all')
 
+    last_attempt_only_str = request.GET.get('lastAttemptOnly', 'false')
+
+    if last_attempt_only_str == 'false':
+        last_attempt_only = False
+    else:
+        last_attempt_only = True
+
     from_date = datetime.strptime(from_date_str, '%Y-%m-%d') if from_date_str else \
         datetime(datetime.now().year, datetime.now().month, 1)
     to_date = datetime.strptime(to_date_str, '%Y-%m-%d') + relativedelta(days=1) if to_date_str else datetime.now()
@@ -243,11 +250,11 @@ def userDashboard(request):
     department_user = User.objects.get_total_users_by_user_department()
 
     overall_pass_fail = Result.objects.get_total_result_status(from_date, to_date, filter_division, filter_grc,
-                                                               filter_department)
+                                                               filter_department, last_attempt_only)
     module_pass_fail = Result.objects.group_result_status_by_module(from_date, to_date, filter_division, filter_grc,
-                                                                    filter_department)
+                                                                    filter_department, last_attempt_only)
     scenario_pass_fail = Result.objects.group_result_status_by_scenario(from_date, to_date, filter_division, filter_grc,
-                                                                        filter_department)
+                                                                        filter_department, last_attempt_only)
 
     modules = Module.objects.values_list('module_name', flat=True)
 

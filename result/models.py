@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 from django.db import models
-from django.db.models import Count, Case, When, IntegerField, Q, Value, F, Sum
+from django.db.models import Count, Case, When, IntegerField, Q, Value, F, Sum, Max
 from django.db.models.functions import TruncMonth, TruncDate
 from dateutil.relativedelta import relativedelta
 
@@ -132,7 +132,7 @@ class ResultManager(models.Manager):
         return results, dates
 
     def get_total_result_status(self, from_date=None, to_date=None, filter_division='all', filter_grc='all',
-                                filter_department='all'):
+                                filter_department='all', last_attempt_only=False):
         """
         Show total pass and fail
         """
@@ -149,14 +149,22 @@ class ResultManager(models.Manager):
         elif filter_department != 'all':
             q &= Q(user__division__grc__user_department__id=filter_department)
 
+        if last_attempt_only:
+            last_attempt_ids = Result.objects.values('user__id', 'scenario').annotate(
+                last_attempt_id=Max(F('id'))
+            ).values_list('last_attempt_id', flat=True)
+
+            q &= Q(id__in=last_attempt_ids)
+
         results = Result.objects.filter(q).aggregate(
             passed=Count(Case(When(is_pass=True, then=1), output_field=IntegerField())),
             failed=Count(Case(When(is_pass=False, then=1), output_field=IntegerField())),
         )
+
         return results
 
     def group_result_status_by_module(self, from_date=None, to_date=None, filter_division='all', filter_grc='all',
-                                      filter_department='all'):
+                                      filter_department='all', last_attempt_only=False):
         """
         Show total pass and fail (group by module)
         """
@@ -173,6 +181,13 @@ class ResultManager(models.Manager):
         elif filter_department != 'all':
             q &= Q(user__division__grc__user_department__id=filter_department)
 
+        if last_attempt_only:
+            last_attempt_ids = Result.objects.values('user__id', 'scenario').annotate(
+                last_attempt_id=Max(F('id'))
+            ).values_list('last_attempt_id', flat=True)
+
+            q &= Q(id__in=last_attempt_ids)
+
         results = Result.objects.filter(q).values('scenario__module').annotate(
             passed=Count(Case(When(is_pass=True, then=1), output_field=IntegerField())),
             failed=Count(Case(When(is_pass=False, then=1), output_field=IntegerField())),
@@ -180,7 +195,7 @@ class ResultManager(models.Manager):
         return results
 
     def group_result_status_by_scenario(self, from_date=None, to_date=None, filter_division='all', filter_grc='all',
-                                        filter_department='all'):
+                                        filter_department='all', last_attempt_only=False):
         """
         Show total pass and fail (group by scenario)
         """
@@ -196,6 +211,13 @@ class ResultManager(models.Manager):
             q &= Q(user__division__grc__id=filter_grc)
         elif filter_department != 'all':
             q &= Q(user__division__grc__user_department__id=filter_department)
+
+        if last_attempt_only:
+            last_attempt_ids = Result.objects.values('user__id', 'scenario').annotate(
+                last_attempt_id=Max(F('id'))
+            ).values_list('last_attempt_id', flat=True)
+
+            q &= Q(id__in=last_attempt_ids)
 
         results = Result.objects.filter(q).values('scenario').annotate(
             passed=Count(Case(When(is_pass=True, then=1), output_field=IntegerField())),
@@ -443,7 +465,7 @@ class Result(models.Model):
 
 class ResultBreakdownManager(models.Manager):
     def get_event_analysis(self, from_date=None, to_date=None, filter_division='all', filter_grc='all',
-                           filter_department='all', filter_title=None, critical_only=False):
+                           filter_department='all', filter_title=None, critical_only=False, last_attempt_only=False):
         """
         Show total pass and fail of each event (group by event id)
         """
@@ -466,6 +488,13 @@ class ResultBreakdownManager(models.Manager):
 
         if critical_only:
             q &= Q(is_critical=True)
+
+        if last_attempt_only:
+            last_attempt_ids = Result.objects.values('user__id', 'scenario').annotate(
+                last_attempt_id=Max(F('id'))
+            ).values_list('last_attempt_id', flat=True)
+
+            q &= Q(result__id__in=last_attempt_ids)
 
         event_info = ResultBreakdown.objects.filter(q).values('event_id').annotate(
             event_pass=Sum(Case(When(event_is_pass=True, then=Value(1)), default=Value(0)), output_field=IntegerField()),
