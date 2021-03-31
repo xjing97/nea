@@ -314,10 +314,14 @@ class Result(models.Model):
         return self.uid
 
     def update_result_breakdown(self, result_breakdown, scores, user_scores):
-        # self.result_breakdown = json.dumps(result_breakdown)
+        breakdown_str = self.result_breakdown
+        breakdown_json = None
+        if breakdown_str:
+            breakdown_json = json.loads(breakdown_str)
+
         for breakdown in result_breakdown:
             result_breakdown_obj = ResultBreakdown.objects.filter(
-                result__uid=self.uid, event_id=breakdown['event_id']
+                result__uid=self.uid, event_id=breakdown['event_id'], script_id=breakdown['script_id']
             ).first()
 
             result_breakdown_obj.user_event_scores = breakdown['user_event_scores']
@@ -332,6 +336,16 @@ class Result(models.Model):
                 result_breakdown_obj.event_is_pass = True
 
             result_breakdown_obj.save()
+
+            if breakdown_json:
+                for b in breakdown_json:
+                    if 'Script_ID' in b:
+                        if b['Script_ID'] == result_breakdown_obj.script_id and b['Event_ID'] == result_breakdown_obj.event_id:
+                            b['score'] = result_breakdown_obj.user_event_scores
+                    elif b['Event_ID'] == result_breakdown_obj.event_id:
+                            b['score'] = result_breakdown_obj.user_event_scores
+
+                self.result_breakdown = json.dumps(breakdown_json)
 
         if scores:
             self.results = scores
@@ -351,7 +365,10 @@ class Result(models.Model):
             if breakdowns:
                 for breakdown in breakdowns:
                     if self.config:
-                        event = self.get_event_info_from_config(breakdown['Event_ID'])
+                        if 'Script_ID' in breakdown:
+                            event = self.get_event_info_from_config(breakdown['Event_ID'], breakdown['Script_ID'])
+                        else:
+                            event = self.get_event_info_from_config(breakdown['Event_ID'])
 
                         if event:
                             action_performed = None
@@ -379,7 +396,7 @@ class Result(models.Model):
                                     event_is_pass = False
 
                                 ResultBreakdown.objects.create(
-                                    result=self, scenario=self.scenario, user=self.user,
+                                    result=self, scenario=self.scenario, user=self.user, script_id=event['script_id'],
                                     scene_name=event['scene_name'], event_id=event['event_id'],
                                     event_type=event['event_type'], description=event['description'],
                                     event_keywords=event['event_keywords'], action_performed=action_performed,
@@ -389,12 +406,12 @@ class Result(models.Model):
                                     is_critical=event['is_critical_point'], overall_is_pass=self.is_pass
                                 )
 
-    def get_event_info_from_config(self, event_id, scenario_id=None):
+    def get_event_info_from_config(self, event_id, script_id=None):
         try:
             scenario_config = json.loads(self.config)["Scenario"]
             if scenario_config:
-                if scenario_id:
-                    scenario = next(filter(lambda x: x['Script_ID'] == scenario_id, scenario_config), None)
+                if script_id:
+                    scenario = next(filter(lambda x: x['Script_ID'] == script_id, scenario_config), None)
 
                     if scenario:
                         event = next(filter(lambda x: x['Event_ID'] == event_id, scenario['Events']), None)
@@ -410,6 +427,7 @@ class Result(models.Model):
                                     keywords.append(action['Keywords'])
 
                             return {
+                                'script_id': scenario['Script_ID'],
                                 'scene_name': scenario['Scenario_Title'],
                                 'event_id': event['Event_ID'],
                                 'description': event['Hint'],
@@ -422,6 +440,7 @@ class Result(models.Model):
                 else:
                     event = next(filter(lambda event: event['event'], map(lambda x: {
                         'Scenario_Title': x['Scenario_Title'],
+                        'Script_ID': x['Script_ID'],
                         'event': next(filter(lambda y: y['Event_ID'] == event_id, x['Events']), None)
                     }, scenario_config)), None)
 
@@ -436,6 +455,7 @@ class Result(models.Model):
                                 keywords.append(action['Keywords'])
 
                         return {
+                            'script_id': event['Script_ID'],
                             'scene_name': event['Scenario_Title'],
                             'event_id': event['event']['Event_ID'],
                             'description': event['event']['Hint'],
@@ -458,7 +478,7 @@ class Result(models.Model):
             if config_json:
                 init_config = config_json['Init']
                 if init_config:
-                    keyword_passing_score = init_config['Speech_Confident_Level_Pass_Level'] * 100
+                    keyword_passing_score = Decimal(init_config['Speech_Confident_Level_Pass_Level']) * 100
                     return keyword_passing_score
         return None
 
@@ -508,6 +528,7 @@ class ResultBreakdown(models.Model):
     result = models.ForeignKey(Result, on_delete=models.PROTECT)
     scenario = models.ForeignKey(Scenario, on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
+    script_id = models.CharField(max_length=256, default="")
     scene_name = models.CharField(max_length=256, default="")
     event_id = models.CharField(max_length=256, default="")
     event_type = models.CharField(max_length=256, default="")
