@@ -516,10 +516,10 @@ class ResultBreakdownManager(models.Manager):
 
             q &= Q(result__id__in=last_attempt_ids)
 
-        event_info = ResultBreakdown.objects.filter(q).values('event_id').annotate(
+        event_info = ResultBreakdown.objects.filter(q).values('event_id', 'description').annotate(
             event_pass=Sum(Case(When(event_is_pass=True, then=Value(1)), default=Value(0)), output_field=IntegerField()),
             event_fail=Sum(Case(When(event_is_pass=False, then=Value(1)), default=Value(0)), output_field=IntegerField()),
-        ).values('event_id', 'event_pass', 'event_fail')
+        ).values('event_id', 'description', 'event_pass', 'event_fail')
 
         return event_info
 
