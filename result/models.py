@@ -516,11 +516,21 @@ class ResultBreakdownManager(models.Manager):
 
             q &= Q(result__id__in=last_attempt_ids)
 
-        event_info = ResultBreakdown.objects.filter(q).values('event_id').annotate(
-            event_pass=Sum(Case(When(event_is_pass=True, then=Value(1)), default=Value(0)), output_field=IntegerField()),
-            event_fail=Sum(Case(When(event_is_pass=False, then=Value(1)), default=Value(0)), output_field=IntegerField()),
-            descp=F('description')
-        ).values('event_id', 'descp', 'event_pass', 'event_fail')
+        event_info = ResultBreakdown.objects.filter(q).values('event_id', 'script_id').annotate(
+            event_pass=Sum(Case(When(event_is_pass=True, then=Value(1)), default=Value(0)),
+                           output_field=IntegerField()),
+            event_fail=Sum(Case(When(event_is_pass=False, then=Value(1)), default=Value(0)),
+                           output_field=IntegerField()),
+        ).values('event_id', 'script_id', 'event_pass', 'event_fail')
+
+        for eve in event_info:
+            latest_event = ResultBreakdown.objects.filter(
+                event_id=eve['event_id'], script_id=eve['script_id'], scenario__scenario_title=filter_title
+            ).latest('dateCreated')
+            if latest_event:
+                eve['descp'] = latest_event.description
+            else:
+                eve['descp'] = ""
 
         return event_info
 
