@@ -1,8 +1,9 @@
 import json
 
 from django.db import models
-from django.db.models import Count, When, F, Case, Value, CharField, IntegerField, BooleanField
+from django.db.models import Count, When, F, Case, Value , IntegerField, BooleanField, Q
 
+from config.constants import ALL_MAC_IDS
 from module.models import Scenario
 from result.models import Result
 
@@ -26,8 +27,7 @@ class ConfigManager(models.Manager):
             When(scenario__module__id=k, then=v) for k, v in attended_dict.items()
         ]
         config = Config.objects.filter(
-            mac_ids__contains=mac_id,
-            date_deleted__isnull=True
+            (Q(mac_ids__contains=mac_id) | Q(mac_ids__contains=ALL_MAC_IDS)) & Q(date_deleted__isnull=True)
         ).annotate(
             module_name=F('scenario__module__module_name'),
             building_type=F('scenario__inspection_site'),

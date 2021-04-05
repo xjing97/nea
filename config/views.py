@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from config.constants import ALL_MAC_IDS
 from config.models import Config
 from core.models import User
 from module.models import Scenario
@@ -52,13 +53,16 @@ def get_config_with_id(request):
     scenarios = Scenario.objects.values('id', 'scenario_title')
     mac_ids = User.objects.exclude(mac_id="").values_list('mac_id', flat=True)
 
+    mac_ids_list = list(mac_ids)
+    mac_ids_list.insert(0, ALL_MAC_IDS)
+
     return Response(data={'data': {'config': {'scenario__id': config.scenario_id,
                                               'config': config.config,
                                               'breeding_point': config.breeding_point,
                                               'passing_score': config.passing_score,
                                               'mac_ids': config.mac_ids},
                                    'scenarios': list(scenarios),
-                                   'mac_ids': mac_ids}})
+                                   'mac_ids': mac_ids_list}})
 
 
 @api_view(['GET'])
@@ -74,9 +78,12 @@ def get_default_config_with_scenario_id(request):
     scenarios = Scenario.objects.values('id', 'scenario_title')
     mac_ids = User.objects.exclude(mac_id="").values_list('mac_id', flat=True)
 
+    mac_ids_list = list(mac_ids)
+    mac_ids_list.insert(0, ALL_MAC_IDS)
+
     return Response(data={'data': {'config': {'scenario__id': scenario.id,
                                               'config': scenario.default_config},
-                                   'scenarios': list(scenarios), 'mac_ids': mac_ids}})
+                                   'scenarios': list(scenarios), 'mac_ids': mac_ids_list}})
 
 
 @api_view(['GET'])
