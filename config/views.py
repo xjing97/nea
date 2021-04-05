@@ -158,6 +158,28 @@ def edit_config(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+def duplicate_config(request):
+    validator = ValidateIsAdmin()
+    if not validator.validate(request.user.id):
+        return Response(status=403, data={'message': validator.error_message})
+
+    data = request.data
+    config_id = data['config_id']
+
+    config = Config.objects.filter(id=config_id).first()
+
+    if not config:
+        return Response(status=400, data={'message': 'Invalid Config ID: %s' % config_id})
+
+    config.id = None
+    config.mac_ids = '[]'
+    config.save()
+
+    return Response(data={'message': 'Config %s is created' % config.id})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def delete_config(request):
     validator = ValidateIsAdmin()
     if not validator.validate(request.user.id):
