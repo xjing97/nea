@@ -290,7 +290,7 @@ class Result(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     start_time = models.DateTimeField(null=True, blank=True)
     end_time = models.DateTimeField(null=True, blank=True)
-    time_spend = models.DurationField(blank=True, null=True)
+    time_spend = models.CharField(blank=True, null=True, max_length=10)
     results = models.DecimalField(blank=True, null=True, decimal_places=4, max_digits=12)
     user_scores = models.DecimalField(blank=True, null=True, decimal_places=4, max_digits=12)
     total_scores = models.DecimalField(blank=True, null=True, decimal_places=4, max_digits=12)

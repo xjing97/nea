@@ -1,7 +1,12 @@
+import json
 from datetime import datetime, timedelta
 from decimal import Decimal
 
 from dateutil.relativedelta import relativedelta
+from django.core.paginator import Paginator
+from django.db.models import Q, DateTimeField, CharField, TimeField, F, Case, When, Value, ExpressionWrapper, \
+    DurationField
+from django.db.models.functions import Lower, Cast, TruncSecond, Extract
 from django.shortcuts import render
 
 # Create your views here.
@@ -38,7 +43,7 @@ def store_result(request):
     # is_pass = True if data['is_pass'] == 'true' else False
     start_time_str = data['inspection_start']
     end_time_str = data['inspection_end']
-    time_spend_str = data['time_spend']  # format should be HH:mm:ss
+    time_spend = data['time_spend']  # format should be HH:mm:ss
     mac_id = data['mac_id']
     config_id = data['config_id']
     breeding_points_found = data.get('breeding_points_found', '')
@@ -52,8 +57,6 @@ def store_result(request):
         critical_failure = None
 
     try:
-        dt = datetime.strptime(time_spend_str, '%H:%M:%S')
-        time_spend = timedelta(hours=dt.hour, minutes=dt.minute, seconds=dt.second)
         start_time = timezone('Asia/Singapore').localize(datetime.strptime(start_time_str, '%d/%m/%Y %H:%M:%S'))
         end_time = timezone('Asia/Singapore').localize(datetime.strptime(end_time_str, '%d/%m/%Y %H:%M:%S'))
 
@@ -104,31 +107,109 @@ def get_all_results(request):
     if not validator.validate(request.user.id):
         return Response(status=403, data={'message': validator.error_message})
 
-    result = Result.objects.filter(
-        user__is_active=True
-    ).values(
-        'id', 'uid', 'user__username', 'user__soeId', 'user__division__grc__grc_name',
-        'user__division__division_name', 'user__division__grc__user_department__department_name',
-        'user__division__grc__id', 'user__division__id', 'user__division__grc__user_department__id',
-        'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id', 'scenario__scenario_title',
-        'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated', 'audio', 'start_time', 'end_time',
-        'breeding_points', 'breeding_points_not_found', 'breeding_points_found', 'critical_failure', 'config',
-        'result_breakdown'
-    ).order_by('-dateCreated')
+    page = int(request.GET.get('page', 1))
+    items = int(request.GET.get('items', 10))
+    sorter_value = json.loads(request.GET.get('sorterValue', '{}'))
+    column_filter_value = json.loads(request.GET.get('columnFilterValue', '{}'))
+    universal_filter_value = request.GET.get('filter', '')
+
+    retrieve_values = ['id', 'uid', 'user__username', 'user__soeId', 'user__division__grc__grc_name',
+                       'user__division__division_name', 'user__division__grc__user_department__department_name',
+                       'user__division__grc__id', 'user__division__id', 'user__division__grc__user_department__id',
+                       'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id',
+                       'date_created', 'start_time_str', 'end_time_str', 'is_pass_str',
+                       'scenario__scenario_title', 'scenario__module__module_name', 'scenario__inspection_site',
+                       'dateCreated', 'audio', 'start_time', 'end_time', 'breeding_points', 'breeding_points_not_found',
+                       'breeding_points_found', 'critical_failure', 'config', 'result_breakdown']
+
+    if 'column' in sorter_value and sorter_value['column']:
+        sort_column = sorter_value['column']
+        if sort_column not in ['results', 'critical_failure']:
+            sort_column = Lower(sort_column)
+        if not sorter_value['asc']:
+            sort_column = '-' + sort_column
+    else:
+        sort_column = '-date_created'
+
+    q = Q(user__is_active=True)
+
+    if universal_filter_value:
+        universal_q = Q()
+        for v in retrieve_values:
+            if v not in ['id', 'config', 'result_breakdown', 'audio', 'scenario_id', 'scenario__module_id','is_pass',
+                         'user__division__grc__id', 'user__division__id', 'user__division__grc__user_department__id',
+                         'start_time', 'end_time',
+                         'breeding_points', 'breeding_points_not_found', 'breeding_points_found']:
+                universal_q.add(Q(**{'{}__icontains'.format(v): universal_filter_value}), Q.OR)
+        q &= universal_q
+
+    if column_filter_value:
+        for key in column_filter_value:
+            if column_filter_value[key]:
+                q.add(Q(**{'{}__icontains'.format(key): column_filter_value[key]}), Q.AND)
+
+    total_items = Result.objects.annotate(
+        date_created=Cast(
+            TruncSecond('dateCreated', DateTimeField()), CharField()
+        ),
+        start_time_str=Cast(
+            TruncSecond('start_time', DateTimeField()), CharField()
+        ),
+        end_time_str=Cast(
+            TruncSecond('end_time', DateTimeField()), CharField()
+        ),
+        # time_spend_str=F('time_spend'),
+        # time_spend_time=ExpressionWrapper(F('time_spend'), output_field=TimeField()),
+        # time_spend_str=Cast(
+        #     TruncSecond('time_spend_time', TimeField()), CharField()
+        # ),
+        is_pass_str=Case(When(is_pass=True, then=Value("Passed")), default=Value("Failed"), output_field=CharField()),
+    ).filter(q).count()
+    total_page_num = total_items // items + 1 if total_items % items else total_items / items
+
+    result = Result.objects.annotate(
+        date_created=Cast(
+            TruncSecond('dateCreated', DateTimeField()), CharField()
+        ),
+        start_time_str=Cast(
+            TruncSecond('start_time', DateTimeField()), CharField()
+        ),
+        end_time_str=Cast(
+            TruncSecond('end_time', DateTimeField()), CharField()
+        ),
+        # time_spend_str=F('time_spend'),
+        # time_spend_str=Case(When(start_time__isnull=False, then=F('end_time') - F('start_time'))),
+        # time_spend_time=ExpressionWrapper(F('time_spend'), output_field=TimeField()),
+        # time_spend_str=Cast(
+        #     TruncSecond('time_spend_time', TimeField()), CharField()
+        # ),
+        is_pass_str=Case(When(is_pass=True, then=Value("Passed")), default=Value("Failed"), output_field=CharField()),
+    ).filter(q).values(*retrieve_values).order_by(sort_column)
+
+    # for r in result:
+    #     print(type(r['time_spend_str']), r['time_spend_str'])
+
+    paginator = Paginator(result, items)
+    paginated_result = paginator.get_page(page)
 
     result_details = ResultBreakdown.objects.filter(
         user__is_active=True
-    ).values('result__uid', 'scenario__module__module_name', 'scenario__scenario_title', 'scene_name', 'event_id',
-             'event_keywords', 'event_type', 'description', 'action_performed', 'keywords_spoken', 'user_event_scores',
-             'user_location', 'time_spent', 'total_event_scores', 'event_is_pass', 'is_critical', 'overall_is_pass',
-             'dateCreated', 'dateUpdated')
+    ).values(
+        'result__uid', 'scenario__module__module_name', 'scenario__scenario_title', 'scene_name', 'event_id',
+        'event_keywords', 'event_type', 'description', 'action_performed', 'keywords_spoken', 'user_event_scores',
+        'user_location', 'time_spent', 'total_event_scores', 'event_is_pass', 'is_critical', 'overall_is_pass',
+        'dateCreated', 'dateUpdated')
 
     all_modules_scenarios = Module.objects.values('id', 'module_name', 'scenario__id', 'scenario__scenario_title')
 
-    return Response(status=200, data={'data': {'results': list(result),
-                                               'result_details': list(result_details),
-                                               'modules_scenarios': list(all_modules_scenarios)},
-                                      'message': 'Get all results successfully'})
+    return Response(status=200, data={
+        'data': {
+            'results': list(paginated_result),
+            'all_results': list(result),
+            'result_details': list(result_details),
+            'modules_scenarios': list(all_modules_scenarios),
+            'total_page_num': total_page_num
+        }, 'message': 'Get all results successfully'})
 
 
 @api_view(['GET'])
