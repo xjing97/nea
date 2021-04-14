@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime, timedelta
 from decimal import Decimal
 
@@ -10,6 +11,7 @@ from django.db.models.functions import Lower, Cast, TruncSecond, Extract
 from django.shortcuts import render
 
 # Create your views here.
+from django.views.static import serve
 from pytz import timezone
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -20,6 +22,7 @@ from module.models import Scenario, Module
 from nea.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 
+from nea.settings import BASE_DIR
 from nea.validator import ValidateIsAdmin
 from .models import Result, ResultBreakdown
 
@@ -158,13 +161,9 @@ def get_all_results(request):
         end_time_str=Cast(
             TruncSecond('end_time', DateTimeField()), CharField()
         ),
-        # time_spend_str=F('time_spend'),
-        # time_spend_time=ExpressionWrapper(F('time_spend'), output_field=TimeField()),
-        # time_spend_str=Cast(
-        #     TruncSecond('time_spend_time', TimeField()), CharField()
-        # ),
         is_pass_str=Case(When(is_pass=True, then=Value("Passed")), default=Value("Failed"), output_field=CharField()),
     ).filter(q).count()
+
     total_page_num = total_items // items + 1 if total_items % items else total_items / items
 
     result = Result.objects.annotate(
@@ -177,17 +176,8 @@ def get_all_results(request):
         end_time_str=Cast(
             TruncSecond('end_time', DateTimeField()), CharField()
         ),
-        # time_spend_str=F('time_spend'),
-        # time_spend_str=Case(When(start_time__isnull=False, then=F('end_time') - F('start_time'))),
-        # time_spend_time=ExpressionWrapper(F('time_spend'), output_field=TimeField()),
-        # time_spend_str=Cast(
-        #     TruncSecond('time_spend_time', TimeField()), CharField()
-        # ),
         is_pass_str=Case(When(is_pass=True, then=Value("Passed")), default=Value("Failed"), output_field=CharField()),
     ).filter(q).values(*retrieve_values).order_by(sort_column)
-
-    # for r in result:
-    #     print(type(r['time_spend_str']), r['time_spend_str'])
 
     paginator = Paginator(result, items)
     paginated_result = paginator.get_page(page)
@@ -383,3 +373,10 @@ def update_result_breakdown(request):
         return Response(status=200, data={'message': 'Success'})
     except Exception as e:
         return Response(status=400, data={'message': str(e)})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def play_audio_file(request, path):
+    document_root = os.path.join(BASE_DIR, 'upload/audio/')
+
+    return serve(request, path, document_root=document_root, show_indexes=False)
