@@ -192,14 +192,15 @@ def get_all_results(request):
 
     all_modules_scenarios = Module.objects.values('id', 'module_name', 'scenario__id', 'scenario__scenario_title')
 
-    return Response(status=200, data={
-        'data': {
-            'results': list(paginated_result),
-            'all_results': list(result),
-            'result_details': list(result_details),
-            'modules_scenarios': list(all_modules_scenarios),
-            'total_page_num': total_page_num
-        }, 'message': 'Get all results successfully'})
+    return Response(status=200,
+                    data={
+                        'data': {
+                            'results': list(paginated_result),
+                            'all_results': list(result),
+                            'result_details': list(result_details),
+                            'modules_scenarios': list(all_modules_scenarios),
+                            'total_page_num': total_page_num
+                        }, 'message': 'Get all results successfully'})
 
 
 @api_view(['GET'])
@@ -375,7 +376,7 @@ def update_result_breakdown(request):
         return Response(status=400, data={'message': str(e)})
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def play_audio_file(request, path):
     document_root = os.path.join(BASE_DIR, 'upload/audio/')
 
