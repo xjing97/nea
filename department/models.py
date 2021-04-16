@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Avg, Case, When, F, Count, IntegerField
 
 
 class UserDepartmentManager(models.Manager):
@@ -16,11 +17,30 @@ class UserDepartment(models.Model):
         return self.department_name
 
 
+class GRCManager(models.Manager):
+    def get_average_scores_by_scenario(self):
+        average_scores = GRC.objects.values('grc_name').annotate(
+            module=F('division__user__result__scenario__module__module_name'),
+            average=Avg(F('division__user__result__results'))
+        )
+        return average_scores
+
+    def get_passing_rate_of_grcs(self):
+        passing_rates = GRC.objects.values('grc_name').annotate(
+            passed=Count(Case(When(division__user__result__is_pass=True, then=1), output_field=IntegerField())),
+            failed=Count(Case(When(division__user__result__is_pass=False, then=1), output_field=IntegerField())),
+        )
+
+        return passing_rates
+
+
 class GRC(models.Model):
     user_department = models.ForeignKey(UserDepartment, on_delete=models.PROTECT, related_name='grc')
     grc_name = models.CharField(max_length=256, default="NA")
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
+
+    objects = GRCManager()
 
     class Meta:
         unique_together = ['user_department', 'grc_name']

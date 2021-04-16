@@ -261,3 +261,19 @@ def delete_division(request):
         return Response(status=400, data=error_message)
 
     return Response(data={'message': "Division '" + division_name + "' is deleted"})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_average_scores_by_scenario(request):
+    average_scores = GRC.objects.get_average_scores_by_scenario()
+
+    return Response(data={'data': list(average_scores)})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_passing_rate_of_grcs(request):
+    passing_rates = GRC.objects.get_passing_rate_of_grcs()
+
+    return Response(data={'data': list(passing_rates)})
