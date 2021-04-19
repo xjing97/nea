@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Avg, Case, When, F, Count, IntegerField
+from django.db.models import Avg, Case, When, F, Count, IntegerField, Q
 
 
 class UserDepartmentManager(models.Manager):
@@ -18,14 +18,32 @@ class UserDepartment(models.Model):
 
 
 class GRCManager(models.Manager):
-    def get_average_scores_by_scenario(self):
+    def get_average_scores_by_scenario(self, from_date=None, to_date=None, last_attempt_ids=[]):
+        q = Q(division__user__is_active=True)
+        if from_date:
+            q &= Q(division__user__result__dateCreated__gte=from_date)
+        if to_date:
+            q &= Q(division__user__result__dateCreated__lte=to_date)
+
+        if last_attempt_ids:
+            q &= Q(division__user__result__id__in=last_attempt_ids)
+
         average_scores = GRC.objects.values('grc_name').annotate(
             module=F('division__user__result__scenario__module__module_name'),
             average=Avg(F('division__user__result__results'))
         )
         return average_scores
 
-    def get_passing_rate_of_grcs(self):
+    def get_passing_rate_of_grcs(self, from_date=None, to_date=None, last_attempt_ids=[]):
+        q = Q(division__user__is_active=True)
+        if from_date:
+            q &= Q(division__user__result__dateCreated__gte=from_date)
+        if to_date:
+            q &= Q(division__user__result__dateCreated__lte=to_date)
+
+        if last_attempt_ids:
+            q &= Q(division__user__result__id__in=last_attempt_ids)
+
         passing_rates = GRC.objects.values('grc_name').annotate(
             passed=Count(Case(When(division__user__result__is_pass=True, then=1), output_field=IntegerField())),
             failed=Count(Case(When(division__user__result__is_pass=False, then=1), output_field=IntegerField())),
