@@ -28,7 +28,7 @@ class GRCManager(models.Manager):
         if last_attempt_ids:
             q &= Q(division__user__result__id__in=last_attempt_ids)
 
-        average_scores = GRC.objects.values('grc_name').annotate(
+        average_scores = GRC.objects.filter(q).values('grc_name').annotate(
             module=F('division__user__result__scenario__module__module_name'),
             average=Avg(F('division__user__result__results'))
         )
@@ -44,7 +44,7 @@ class GRCManager(models.Manager):
         if last_attempt_ids:
             q &= Q(division__user__result__id__in=last_attempt_ids)
 
-        passing_rates = GRC.objects.values('grc_name').annotate(
+        passing_rates = GRC.objects.filter(q).values('grc_name').annotate(
             passed=Count(Case(When(division__user__result__is_pass=True, then=1), output_field=IntegerField())),
             failed=Count(Case(When(division__user__result__is_pass=False, then=1), output_field=IntegerField())),
         )

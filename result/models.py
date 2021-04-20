@@ -330,9 +330,7 @@ class ResultManager(models.Manager):
             user_department=F('user__division__grc__user_department__department_name')
         ).values('average', 'inspection_site', 'user_department')
 
-        inspection_sites = Result.objects.filter(q).values_list('scenario__inspection_site', flat=True).distinct()
-
-        return results, inspection_sites
+        return results
 
 
 class Result(models.Model):

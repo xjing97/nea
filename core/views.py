@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from department.models import UserDepartment, GRC
-from module.models import Module
+from module.models import Module, Scenario
 from nea.decorators import permission_exempt, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
@@ -258,14 +258,17 @@ def userDashboard(request):
     scenario_pass_fail = Result.objects.group_result_status_by_scenario(from_date, to_date, filter_division, filter_grc,
                                                                         filter_department, list(last_attempt_ids))
 
+    all_grcs = GRC.objects.exclude(grc_name="NA").values_list('grc_name', flat=True).order_by('grc_name')
     grc_average_scores = GRC.objects.get_average_scores_by_scenario(from_date, to_date, list(last_attempt_ids))
     grc_passing_rates = GRC.objects.get_passing_rate_of_grcs(from_date, to_date, list(last_attempt_ids))
 
     passing_rate_by_module_and_ro = Result.objects.get_passing_rate_by_module_and_ro(
         from_date, to_date, filter_division, filter_grc, filter_department, list(last_attempt_ids))
 
-    avg_score_by_site_and_ro, inspection_site = Result.objects.get_avg_score_by_site_and_ro(
+    avg_score_by_site_and_ro = Result.objects.get_avg_score_by_site_and_ro(
         from_date, to_date, filter_division, filter_grc, filter_department, list(last_attempt_ids))
+
+    inspection_site = Scenario.objects.values_list('inspection_site', flat=True).distinct()
 
     modules = Module.objects.values_list('module_name', flat=True)
 
@@ -274,6 +277,7 @@ def userDashboard(request):
                           'modules': list(modules),
                           'scenario_pass_fail': list(scenario_pass_fail),
                           'module_pass_fail': list(module_pass_fail),
+                          'all_grcs': list(all_grcs),
                           'grc_average_scores': list(grc_average_scores),
                           'grc_passing_rates': list(grc_passing_rates),
                           'passing_rate_by_module_and_ro': list(passing_rate_by_module_and_ro),
