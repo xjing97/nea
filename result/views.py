@@ -165,7 +165,7 @@ def get_all_results(request):
             TruncSecond('end_time', DateTimeField()), CharField()
         ),
         is_pass_str=Case(When(is_pass=True, then=Value("Passed")), default=Value("Failed"), output_field=CharField()),
-        is_completed_str=Case(When(is_completed=True, then=Value("Completed")), default=Value("Not Completed"),
+        is_completed_str=Case(When(is_completed=True, then=Value("Completed")), default=Value("Incomplete"),
                               output_field=CharField()),
     ).filter(q).count()
 
@@ -182,7 +182,7 @@ def get_all_results(request):
             TruncSecond('end_time', DateTimeField()), CharField()
         ),
         is_pass_str=Case(When(is_pass=True, then=Value("Passed")), default=Value("Failed"), output_field=CharField()),
-        is_completed_str=Case(When(is_completed=True, then=Value("Completed")), default=Value("Not Completed"),
+        is_completed_str=Case(When(is_completed=True, then=Value("Completed")), default=Value("Incomplete"),
                               output_field=CharField()),
     ).filter(q).values(*retrieve_values).order_by(sort_column)
 
