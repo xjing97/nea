@@ -1,12 +1,13 @@
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
+from django.db.models import Max, F
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from department.models import UserDepartment
-from module.models import Module
+from department.models import UserDepartment, GRC
+from module.models import Module, Scenario
 from nea.decorators import permission_exempt, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
@@ -238,10 +239,11 @@ def userDashboard(request):
 
     last_attempt_only_str = request.GET.get('lastAttemptOnly', 'false')
 
-    if last_attempt_only_str == 'false':
-        last_attempt_only = False
-    else:
-        last_attempt_only = True
+    last_attempt_ids = []
+    if last_attempt_only_str != 'false':
+        last_attempt_ids = Result.objects.values('user__id', 'scenario').annotate(
+            last_attempt_id=Max(F('id'))
+        ).values_list('last_attempt_id', flat=True)
 
     from_date = datetime.strptime(from_date_str, '%Y-%m-%d') if from_date_str else \
         datetime(datetime.now().year, datetime.now().month, 1)
@@ -250,11 +252,23 @@ def userDashboard(request):
     department_user = User.objects.get_total_users_by_user_department()
 
     overall_pass_fail = Result.objects.get_total_result_status(from_date, to_date, filter_division, filter_grc,
-                                                               filter_department, last_attempt_only)
+                                                               filter_department, list(last_attempt_ids))
     module_pass_fail = Result.objects.group_result_status_by_module(from_date, to_date, filter_division, filter_grc,
-                                                                    filter_department, last_attempt_only)
+                                                                    filter_department, list(last_attempt_ids))
     scenario_pass_fail = Result.objects.group_result_status_by_scenario(from_date, to_date, filter_division, filter_grc,
-                                                                        filter_department, last_attempt_only)
+                                                                        filter_department, list(last_attempt_ids))
+
+    all_grcs = GRC.objects.exclude(grc_name="NA").values_list('grc_name', flat=True).order_by('grc_name')
+    grc_average_scores = GRC.objects.get_average_scores_by_scenario(from_date, to_date, list(last_attempt_ids))
+    grc_passing_rates = GRC.objects.get_passing_rate_of_grcs(from_date, to_date, list(last_attempt_ids))
+
+    passing_rate_by_module_and_ro = Result.objects.get_passing_rate_by_module_and_ro(
+        from_date, to_date, filter_division, filter_grc, filter_department, list(last_attempt_ids))
+
+    avg_score_by_site_and_ro = Result.objects.get_avg_score_by_site_and_ro(
+        from_date, to_date, filter_division, filter_grc, filter_department, list(last_attempt_ids))
+
+    inspection_site = Scenario.objects.values_list('inspection_site', flat=True).distinct()
 
     modules = Module.objects.values_list('module_name', flat=True)
 
@@ -262,4 +276,11 @@ def userDashboard(request):
                           'overall_pass_fail': overall_pass_fail,
                           'modules': list(modules),
                           'scenario_pass_fail': list(scenario_pass_fail),
-                          'module_pass_fail': list(module_pass_fail)})
+                          'module_pass_fail': list(module_pass_fail),
+                          'all_grcs': list(all_grcs),
+                          'grc_average_scores': list(grc_average_scores),
+                          'grc_passing_rates': list(grc_passing_rates),
+                          'passing_rate_by_module_and_ro': list(passing_rate_by_module_and_ro),
+                          'avg_score_by_site_and_ro': list(avg_score_by_site_and_ro),
+                          'inspection_site': list(inspection_site),
+                          })

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 from django.db import models
-from django.db.models import Count, Case, When, IntegerField, Q, Value, F, Sum, Max
+from django.db.models import Count, Case, When, IntegerField, Q, Value, F, Sum, Max, Avg
 from django.db.models.functions import TruncMonth, TruncDate
 from dateutil.relativedelta import relativedelta
 
@@ -132,7 +132,7 @@ class ResultManager(models.Manager):
         return results, dates
 
     def get_total_result_status(self, from_date=None, to_date=None, filter_division='all', filter_grc='all',
-                                filter_department='all', last_attempt_only=False):
+                                filter_department='all', last_attempt_ids=[]):
         """
         Show total pass and fail
         """
@@ -149,11 +149,7 @@ class ResultManager(models.Manager):
         elif filter_department != 'all':
             q &= Q(user__division__grc__user_department__id=filter_department)
 
-        if last_attempt_only:
-            last_attempt_ids = Result.objects.values('user__id', 'scenario').annotate(
-                last_attempt_id=Max(F('id'))
-            ).values_list('last_attempt_id', flat=True)
-
+        if last_attempt_ids:
             q &= Q(id__in=last_attempt_ids)
 
         results = Result.objects.filter(q).aggregate(
@@ -164,7 +160,7 @@ class ResultManager(models.Manager):
         return results
 
     def group_result_status_by_module(self, from_date=None, to_date=None, filter_division='all', filter_grc='all',
-                                      filter_department='all', last_attempt_only=False):
+                                      filter_department='all', last_attempt_ids=False):
         """
         Show total pass and fail (group by module)
         """
@@ -181,11 +177,7 @@ class ResultManager(models.Manager):
         elif filter_department != 'all':
             q &= Q(user__division__grc__user_department__id=filter_department)
 
-        if last_attempt_only:
-            last_attempt_ids = Result.objects.values('user__id', 'scenario').annotate(
-                last_attempt_id=Max(F('id'))
-            ).values_list('last_attempt_id', flat=True)
-
+        if last_attempt_ids:
             q &= Q(id__in=last_attempt_ids)
 
         results = Result.objects.filter(q).values('scenario__module').annotate(
@@ -195,7 +187,7 @@ class ResultManager(models.Manager):
         return results
 
     def group_result_status_by_scenario(self, from_date=None, to_date=None, filter_division='all', filter_grc='all',
-                                        filter_department='all', last_attempt_only=False):
+                                        filter_department='all', last_attempt_ids=[]):
         """
         Show total pass and fail (group by scenario)
         """
@@ -212,11 +204,7 @@ class ResultManager(models.Manager):
         elif filter_department != 'all':
             q &= Q(user__division__grc__user_department__id=filter_department)
 
-        if last_attempt_only:
-            last_attempt_ids = Result.objects.values('user__id', 'scenario').annotate(
-                last_attempt_id=Max(F('id'))
-            ).values_list('last_attempt_id', flat=True)
-
+        if last_attempt_ids:
             q &= Q(id__in=last_attempt_ids)
 
         results = Result.objects.filter(q).values('scenario').annotate(
@@ -282,6 +270,67 @@ class ResultManager(models.Manager):
         ).values('id', 'uid', 'user_department', 'grc', 'division', 'results', 'critical_failure', 'dateCreated')
 
         return overview, details, failure_dict
+
+    def get_passing_rate_by_module_and_ro(self, from_date=None, to_date=None, filter_division='all', filter_grc='all',
+                                          filter_department='all', last_attempt_ids=[]):
+        """
+        Get Passing Rate by Module (group by RO)
+        """
+        q = Q(user__is_active=True)
+        if from_date:
+            q &= Q(dateCreated__gte=from_date)
+        if to_date:
+            q &= Q(dateCreated__lte=to_date)
+
+        if filter_division != 'all':
+            q &= Q(user__division__id=filter_division)
+        elif filter_grc != 'all':
+            q &= Q(user__division__grc__id=filter_grc)
+        elif filter_department != 'all':
+            q &= Q(user__division__grc__user_department__id=filter_department)
+
+        if last_attempt_ids:
+            q &= Q(id__in=last_attempt_ids)
+
+        results = Result.objects.filter(q).values('scenario__module', 'user__division__grc__user_department').annotate(
+            passed=Count(Case(When(is_pass=True, then=1), output_field=IntegerField())),
+            failed=Count(Case(When(is_pass=False, then=1), output_field=IntegerField())),
+            module_name=F('scenario__module__module_name'),
+            user_department=F('user__division__grc__user_department__department_name')
+        ).values('passed', 'failed', 'module_name', 'user_department')
+
+        return results
+
+    def get_avg_score_by_site_and_ro(self, from_date=None, to_date=None, filter_division='all', filter_grc='all',
+                                     filter_department='all', last_attempt_ids=[]):
+        """
+        Get Average Score by Inspection Sites (group by RO)
+        """
+        q = Q(user__is_active=True)
+        if from_date:
+            q &= Q(dateCreated__gte=from_date)
+        if to_date:
+            q &= Q(dateCreated__lte=to_date)
+
+        if filter_division != 'all':
+            q &= Q(user__division__id=filter_division)
+        elif filter_grc != 'all':
+            q &= Q(user__division__grc__id=filter_grc)
+        elif filter_department != 'all':
+            q &= Q(user__division__grc__user_department__id=filter_department)
+
+        if last_attempt_ids:
+            q &= Q(id__in=last_attempt_ids)
+
+        results = Result.objects.filter(q).values(
+            'scenario__inspection_site', 'user__division__grc__user_department'
+        ).annotate(
+            average=Avg(F('results')),
+            inspection_site=F('scenario__inspection_site'),
+            user_department=F('user__division__grc__user_department__department_name')
+        ).values('average', 'inspection_site', 'user_department')
+
+        return results
 
 
 class Result(models.Model):
