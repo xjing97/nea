@@ -55,6 +55,7 @@ def store_result(request):
     result_breakdown = data['result_breakdown']
     teleport_path = data['teleport_path']
     audio_file = data['audio_file']
+    is_completed_str = data.get('is_completed', 'true')
 
     if not critical_failure:
         critical_failure = None
@@ -62,6 +63,8 @@ def store_result(request):
     try:
         start_time = timezone('Asia/Singapore').localize(datetime.strptime(start_time_str, '%d/%m/%Y %H:%M:%S'))
         end_time = timezone('Asia/Singapore').localize(datetime.strptime(end_time_str, '%d/%m/%Y %H:%M:%S'))
+
+        is_completed = True if is_completed_str == 'true' else False
 
     except Exception as e:
         print(str(e))
@@ -94,7 +97,7 @@ def store_result(request):
                                        time_spend=time_spend, mac_id=mac_id, config=config_obj.config,
                                        passing_score=passing_score,
                                        result_breakdown=result_breakdown, teleport_path=teleport_path,
-                                       critical_failure=critical_failure,
+                                       critical_failure=critical_failure, is_completed=is_completed,
                                        audio=audio_file)
         result.create_result_breakdown()
         return Response(status=200, data={'result_id': result.uid, 'message': 'Stored result successfully'})
@@ -120,7 +123,7 @@ def get_all_results(request):
                        'user__division__division_name', 'user__division__grc__user_department__department_name',
                        'user__division__grc__id', 'user__division__id', 'user__division__grc__user_department__id',
                        'time_spend', 'results', 'is_pass', 'scenario_id', 'scenario__module_id',
-                       'date_created', 'start_time_str', 'end_time_str', 'is_pass_str',
+                       'date_created', 'start_time_str', 'end_time_str', 'is_pass_str', 'is_completed_str',
                        'scenario__scenario_title', 'scenario__module__module_name', 'scenario__inspection_site',
                        'dateCreated', 'audio', 'start_time', 'end_time', 'breeding_points', 'breeding_points_not_found',
                        'breeding_points_found', 'critical_failure', 'config', 'result_breakdown']
@@ -162,6 +165,8 @@ def get_all_results(request):
             TruncSecond('end_time', DateTimeField()), CharField()
         ),
         is_pass_str=Case(When(is_pass=True, then=Value("Passed")), default=Value("Failed"), output_field=CharField()),
+        is_completed_str=Case(When(is_completed=True, then=Value("Completed")), default=Value("Not Completed"),
+                              output_field=CharField()),
     ).filter(q).count()
 
     total_page_num = total_items // items + 1 if total_items % items else total_items / items
@@ -177,6 +182,8 @@ def get_all_results(request):
             TruncSecond('end_time', DateTimeField()), CharField()
         ),
         is_pass_str=Case(When(is_pass=True, then=Value("Passed")), default=Value("Failed"), output_field=CharField()),
+        is_completed_str=Case(When(is_completed=True, then=Value("Completed")), default=Value("Not Completed"),
+                              output_field=CharField()),
     ).filter(q).values(*retrieve_values).order_by(sort_column)
 
     paginator = Paginator(result, items)
@@ -223,7 +230,7 @@ def get_result_details(request):
         'time_spend', 'results', 'is_pass', 'user_scores', 'total_scores', 'scenario_id', 'scenario__module_id',
         'scenario__scenario_title', 'scenario__module__module_name', 'scenario__inspection_site', 'dateCreated',
         'audio', 'start_time', 'end_time', 'breeding_points', 'breeding_points_not_found', 'breeding_points_found',
-        'result_breakdown', 'teleport_path'
+        'result_breakdown', 'teleport_path', 'is_completed'
     )
 
     result_breakdown = ResultBreakdown.objects.filter(

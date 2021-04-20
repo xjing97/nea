@@ -304,6 +304,10 @@ class Result(models.Model):
     result_breakdown = models.TextField(blank=True, null=True)
     teleport_path = models.TextField(blank=True, null=True)
     critical_failure = models.CharField(max_length=256, null=True, blank=True)
+    is_completed = models.BooleanField(default=True, help_text='To indicate whether the user completed the evaluation '
+                                                               '(Set to False when evaluation ends because of timeout /'
+                                                               ' User choose to quite in the middle of the '
+                                                               'evaluation)')
     audio = models.FileField(upload_to='upload/audio', blank=True, null=True)
     dateCreated = models.DateTimeField(auto_now_add=True)
     dateUpdated = models.DateTimeField(auto_now=True)
