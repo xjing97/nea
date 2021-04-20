@@ -400,7 +400,7 @@ class Result(models.Model):
 
                 self.result_breakdown = json.dumps(breakdown_json)
 
-        if scores:
+        if scores is not None:
             self.results = scores
             self.user_scores = user_scores
             if not self.critical_failure:
