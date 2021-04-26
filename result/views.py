@@ -64,7 +64,7 @@ def store_result(request):
         start_time = timezone('Asia/Singapore').localize(datetime.strptime(start_time_str, '%d/%m/%Y %H:%M:%S'))
         end_time = timezone('Asia/Singapore').localize(datetime.strptime(end_time_str, '%d/%m/%Y %H:%M:%S'))
 
-        is_completed = True if is_completed_str == 'true' else False
+        is_completed = bool(is_completed_str)
 
     except Exception as e:
         print(str(e))
