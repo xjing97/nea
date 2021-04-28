@@ -78,6 +78,16 @@ def login(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def set_completed_tutorial(request):
+    user_id = request.user.id
+    user = User.objects.filter(id=user_id).first()
+    user.is_completed_tutorial = True
+    user.save()
+    return Response(status=200)
+
+
+@api_view(['POST'])
 @permission_exempt
 def renewToken(request):
     if 'refreshToken' not in request.data:

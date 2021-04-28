@@ -1,7 +1,7 @@
 from django.urls import path
 
 from config.views import get_config_by_macid, get_practice_config
-from core.views import renewToken, logout
+from core.views import renewToken, logout, set_completed_tutorial
 from result.views import store_result
 from .views import login, ChangePasswordView
 
@@ -12,6 +12,7 @@ app_name = 'api'
 urlpatterns = [
     path('login/', login, name='login'),
     path('logout/', logout, name='logout'),
+    path('set-completed-tutorial/', set_completed_tutorial, name='set_completed_tutorial'),
     path('renew-token/', renewToken, name='renewToken'),
     path('change_password/', ChangePasswordView.as_view(), name='auth_change_password'),
     path('store-result/', store_result, name='storeResult'),

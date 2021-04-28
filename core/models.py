@@ -27,12 +27,8 @@ class UserManager(BaseUserManager):
 
         user = self.model(
             username=username,
-            # grc=grc,
-            # regional_office=regional_office,
-            # department=department,
             division=division_obj,
             soeId=soeId,
-            # profile_pic=profile_pic
         )
         if password:
             user.set_password(password)
@@ -51,9 +47,6 @@ class UserManager(BaseUserManager):
         user = self.model(
             username=username,
             division=division_obj,
-            # grc=grc,
-            # regional_office=regional_office,
-            # department=department,
             soeId=soeId,
             password=password,
             email=email
@@ -85,13 +78,10 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    # profile_pic = models.ImageField(upload_to='upload/profile-pic', default=None)
     soeId = models.CharField(max_length=50, blank=True, unique=True)
-    # department = models.CharField(max_length=100, blank=True)
     mac_id = models.TextField(default="")
     division = models.ForeignKey(Division, on_delete=models.PROTECT, related_name='user', blank=True, null=True)
-    # grc = models.CharField(max_length=256, blank=True)
-    # regional_office = models.CharField(max_length=256, blank=True)
+    is_completed_tutorial = models.BooleanField(default=False)
 
     objects = UserManager()
 
