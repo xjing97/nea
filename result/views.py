@@ -47,7 +47,7 @@ def store_result(request):
     # is_pass = True if data['is_pass'] == 'true' else False
     start_time_str = data['inspection_start']
     end_time_str = data['inspection_end']
-    time_spend = data['time_spend']  # format should be HH:mm:ss
+    time_spend_str = data['time_spend']
     mac_id = data['mac_id']
     config_id = data['config_id']
     breeding_points_found = data.get('breeding_points_found', '')
@@ -64,6 +64,10 @@ def store_result(request):
     try:
         start_time = timezone('Asia/Singapore').localize(datetime.strptime(start_time_str, '%d/%m/%Y %H:%M:%S'))
         end_time = timezone('Asia/Singapore').localize(datetime.strptime(end_time_str, '%d/%m/%Y %H:%M:%S'))
+
+        time_spend_timedelta = timedelta(seconds=float(time_spend_str))
+        time_spend = (datetime(year=1990, month=1, day=1, hour=0, minute=0,
+                               second=0) + time_spend_timedelta).strftime('%H:%M:%S')
 
         is_completed = strtobool(is_completed_str)
 

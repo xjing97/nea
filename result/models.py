@@ -435,11 +435,19 @@ class Result(models.Model):
                                 keyword_spoken = breakdown['Speech']
 
                             try:
-                                dt = datetime.strptime(breakdown['Event_Time'], '%H:%M:%S')
-                                time_spent = timedelta(hours=dt.hour, minutes=dt.minute, seconds=dt.second)
+                                time_spent = timedelta(seconds=breakdown['Event_Duration'])
+                                print(time_spent, str(breakdown['Event_Duration']))
+
+                                event_start_time = None
+                                if 'Event_Time' in breakdown:
+                                    event_start_time_timedelta = timedelta(seconds=breakdown['Event_Time'])
+                                    event_start_time = (datetime(year=1990, month=1, day=1, hour=0, minute=0,
+                                                                 second=0) + event_start_time_timedelta).time()
+
                             except Exception as ex:
                                 print(ex)
                                 time_spent = timedelta(hours=0, minutes=0, seconds=0)
+                                event_start_time = None
 
                             event_is_pass = True
                             if event['total_event_scores'] and 'score' in breakdown:
@@ -454,7 +462,7 @@ class Result(models.Model):
                                     event_type=event['event_type'], description=event['description'],
                                     event_keywords=event['event_keywords'], action_performed=action_performed,
                                     keywords_spoken=keyword_spoken, user_location=breakdown['teleport_location'],
-                                    time_spent=time_spent, user_event_scores=int(breakdown['score']),
+                                    event_start_time=event_start_time, time_spent=time_spent, user_event_scores=int(breakdown['score']),
                                     total_event_scores=event['total_event_scores'], event_is_pass=event_is_pass,
                                     is_critical=event['is_critical_point'], overall_is_pass=self.is_pass
                                 )
@@ -601,6 +609,7 @@ class ResultBreakdown(models.Model):
     action_performed = models.BooleanField(max_length=256, blank=True, null=True, default=None)
     keywords_spoken = models.CharField(max_length=256, blank=True, null=True, default=None)
     user_location = models.CharField(max_length=256, default="")
+    event_start_time = models.TimeField(blank=True, null=True)
     time_spent = models.DurationField(blank=True, null=True)
     user_event_scores = models.DecimalField(blank=True, null=True, decimal_places=4, max_digits=12)
     total_event_scores = models.DecimalField(blank=True, null=True, decimal_places=4, max_digits=12)
