@@ -8,9 +8,11 @@ https://docs.djangoproject.com/en/3.1/howto/deployment/wsgi/
 """
 
 import os
+import sys
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'nea.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'nea.settings-dev')
+sys.path.append('C:/Apache24/htdocs/neaProj')
 
 application = get_wsgi_application()
