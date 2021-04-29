@@ -161,5 +161,7 @@ STATIC_URL = '/upload/'
 AUTH_USER_MODEL = 'core.User'
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'upload'),
+    # os.path.join(BASE_DIR, 'upload'),
 )
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'upload')
