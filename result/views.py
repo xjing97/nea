@@ -131,6 +131,7 @@ def get_all_results(request):
                        'date_created', 'start_time_str', 'end_time_str', 'is_pass_str', 'is_completed_str',
                        'scenario__scenario_title', 'scenario__module__module_name', 'scenario__inspection_site',
                        'dateCreated', 'audio', 'start_time', 'end_time', 'breeding_points', 'breeding_points_not_found',
+                       'user_scores', 'total_scores', 'mac_id', 'passing_score', 'teleport_path',
                        'breeding_points_found', 'critical_failure', 'config', 'result_breakdown']
 
     if 'column' in sorter_value and sorter_value['column']:
@@ -189,7 +190,7 @@ def get_all_results(request):
         is_pass_str=Case(When(is_pass=True, then=Value("Passed")), default=Value("Failed"), output_field=CharField()),
         is_completed_str=Case(When(is_completed=True, then=Value("Completed")), default=Value("Incomplete"),
                               output_field=CharField()),
-    ).filter(q).values(*retrieve_values).order_by(sort_column)
+    ).values(*retrieve_values).order_by(sort_column)
 
     paginator = Paginator(result, items)
     paginated_result = paginator.get_page(page)
