@@ -1,0 +1,4287 @@
+{
+  "Init": {
+    "Building_Type": "LandProperty",
+    "Breeding_Points": [
+      "Garden",
+      "Living Room",
+      "Kitchen",
+      "Toilet_1",
+      "Toilet_2",
+      "OutSide",
+      "Bedroom"
+    ],
+    "Owner_At_Home": true,
+    "Owner_Reject_Entry": false,
+    "Owner_Reject_Unlock_Bedroom": false,
+    "Owner_Appeal": true,
+    "Speech_Confident_Level": "Low",
+    "Speech_Confident_Level_Pass_Level": "0.5",
+    "Difficulty_Level": "high",
+    "Selection_Mode": "practice",
+    "Account": "Tester",
+    "Start_Point": "1.1",
+    "Found_Mosquito_Breeding": [
+      "OutSide",
+      "Living Room"
+    ]
+  },
+  "Scenario": [
+    {
+      "Scenario_Title": "House Entry",
+      "Script_ID": "1.1",
+      "Events": [
+        {
+          "Event_ID": "1.1.0.1",
+          "Character": "Player",
+          "Hint": "[Ring the doorbell.]",
+          "Clue": "What should you do before entering the house?",
+          "Action": [
+            {
+              "Type": "Other",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        },
+        {
+          "Event_ID": "1.1.0.2",
+          "Character": "Player",
+          "Hint": "Good morning. I am #### from NEA. I am here to inspect your house.",
+          "Clue": "What should you say before entering the house?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "inspect",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Owner_Not_At_Home",
+          "Script_ID": "1.2",
+          "Is_Path": "False"
+        },
+        {
+          "Condition": "Owner_At_Home",
+          "Script_ID": "1.2.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Wait for Owner",
+      "Script_ID": "1.2",
+      "Events": [
+        {
+          "Event_ID": "1.2.0.1",
+          "Character": " ",
+          "Hint": "[Waiting for house owner...]",
+          "Clue": "[Waiting for house owner...]",
+          "Action": [
+            {
+              "Type": "Wait"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "8",
+          "Location": "Outside"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "No one at Home",
+          "Script_ID": "1.3",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "No One At Home",
+      "Script_ID": "1.3",
+      "Events": [
+        {
+          "Event_ID": "1.3.0.1",
+          "Character": "Agent",
+          "Hint": "Seems like no one is at home.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "1.3.0.2",
+          "Character": "Player",
+          "Hint": "Let us check the surrounding area.",
+          "Clue": "No one is at home. What should you say?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "check",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "surrounding area",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "1.3.0.3",
+          "Character": "Player",
+          "Hint": "[Check surrounding area for mosquito breeding.]",
+          "Clue": "What should you do inside the surrounding area?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "OutSide_No_Breeding",
+          "Script_ID": "1.4",
+          "Is_Path": "False"
+        },
+        {
+          "Condition": "OutSide_Has_Breeding",
+          "Script_ID": "1.4.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "FlowerPots Has No Breeding",
+      "Script_ID": "1.4",
+      "Events": [
+        {
+          "Event_ID": "1.4.0.1",
+          "Character": "Player",
+          "Hint": "There is no mosquito breeding here.",
+          "Clue": "What should you say after no mosquito breeding is found?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "no mosquito breeding",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "move on",
+          "Script_ID": "1.5.1",
+          "Is_Path": "True"
+        },
+        {
+          "Condition": "sure",
+          "Script_ID": "1.5.2",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "FlowerPots Has Breeding",
+      "Script_ID": "1.4.1",
+      "Events": [
+        {
+          "Event_ID": "1.4.1.1",
+          "Character": "Player",
+          "Hint": "There is potential mosquito breeding here. Could you come over and witness?",
+          "Clue": "What do you see and what should your partner help with?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "potential mosquito breeding",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "witness",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "1.4.1.2",
+          "Character": "Player",
+          "Hint": "[Collect the mosquito breeding sample with pipette, Deposit the sample into the empty vial, and seal and label the vial in front of witness.]",
+          "Clue": "What are the steps you should perform after finding potential mosquito breeding?",
+          "Action": [
+            {
+              "Type": "Button",
+              "Score": "3"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Put Breeding Notice and Letter On letter Box",
+          "Script_ID": "1.8",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Move On",
+      "Script_ID": "1.5.1",
+      "Events": [
+        {
+          "Event_ID": "1.5.1.1",
+          "Character": "Agent",
+          "Hint": "There is nothing here, too. Let us move on.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Put Letter On letter Box",
+          "Script_ID": "1.7",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Sure",
+      "Script_ID": "1.5.2",
+      "Events": [
+        {
+          "Event_ID": "1.5.2.1",
+          "Character": "Agent",
+          "Hint": "Sure.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Put Letter On letter Box",
+          "Script_ID": "1.7",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Put Letter On Letter Box",
+      "Script_ID": "1.7",
+      "Events": [
+        {
+          "Event_ID": "1.7.1",
+          "Character": "Player",
+          "Hint": "[Place Call Letter into the letter box for owner or occupier to contact NEA.]",
+          "Clue": "What is something you can issue to help you enter the house on your next visit?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "1.7.2",
+          "Character": "Agent",
+          "Hint": "Done, let us move on.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Complete",
+          "Script_ID": "Finish",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Put Breeding Notice and Letter On letter Box",
+      "Script_ID": "1.8",
+      "Events": [
+        {
+          "Event_ID": "1.8.1",
+          "Character": "Player",
+          "Hint": "[Place Call Letter and Breeding Notice into the letter box for owner or occupier to contact NEA.]",
+          "Clue": "What is something you can issue to help you enter the house on your next visit?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "1.8.2",
+          "Character": "Agent",
+          "Hint": "Done, let us move on.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Complete",
+          "Script_ID": "Finish",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Owner Response",
+      "Script_ID": "1.2.1",
+      "Events": [
+        {
+          "Event_ID": "1.2.1.1",
+          "Character": "Domestic Helper",
+          "Hint": "Yes?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "shows authority card",
+          "Script_ID": "3.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Shows Authority Card",
+      "Script_ID": "3.1",
+      "Events": [
+        {
+          "Event_ID": "3.1.1",
+          "Character": "Player",
+          "Hint": "[Show Authority Card.]",
+          "Clue": "What should you do before entering the house?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "domestic helper",
+          "Script_ID": "3.1.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Domestic Helper",
+      "Script_ID": "3.1.1",
+      "Events": [
+        {
+          "Event_ID": "3.1.2",
+          "Character": "Player",
+          "Hint": "I am here to inspect your house. May I enter?",
+          "Clue": "What should you say before entering the house?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "inspect",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Employer not in",
+          "Script_ID": "3.2.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Employer Not Around",
+      "Script_ID": "3.2.1",
+      "Events": [
+        {
+          "Event_ID": "3.2.1.1",
+          "Character": "Domestic Helper",
+          "Hint": "Sorry, my employers are not in. I am the domestic helper.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Take 10 Mins",
+          "Script_ID": "3.3",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Take 10 Mins",
+      "Script_ID": "3.3",
+      "Events": [
+        {
+          "Event_ID": "3.3.0.1",
+          "Character": "Player",
+          "Hint": "I’m sorry Madam, the inspection will just take 10 minutes. Please call your employer to allow me to inspect the house?",
+          "Clue": "What should you tell the domestic helper for you to enter the house?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "10 minutes",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "call your employer",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Call Employer",
+          "Script_ID": "3.4",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Call Employer",
+      "Script_ID": "3.4",
+      "Events": [
+        {
+          "Event_ID": "3.4.0.1",
+          "Character": "Domestic Helper",
+          "Hint": "Okay, please wait while I contact my employer.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        },
+        {
+          "Event_ID": "3.4.0.2",
+          "Character": "Domestic Helper",
+          "Hint": "[Contacting employer...]",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "WaitForDirectorPlayer"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "0",
+          "Location": "Outside"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Owner_Not_Reject_Entry",
+          "Script_ID": "2.7.1",
+          "Is_Path": "True"
+        },
+        {
+          "Condition": "Owner_Reject_Entry",
+          "Script_ID": "2.7.2",
+          "Is_Path": "False"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Come In",
+      "Script_ID": "2.7.1",
+      "Events": [
+        {
+          "Event_ID": "2.7.1.1",
+          "Character": "Domestic Helper",
+          "Hint": "Okay, please come in.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "dogs",
+          "Script_ID": "2.12",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Refuse Entry",
+      "Script_ID": "2.7.2",
+      "Events": [
+        {
+          "Event_ID": "2.7.2.1",
+          "Character": "Domestic Helper",
+          "Hint": "No, I refuse! I am busy, come back another day.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "contact us",
+          "Script_ID": "2.10",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Contact Us For Next Visit",
+      "Script_ID": "2.10",
+      "Events": [
+        {
+          "Event_ID": "2.10.0.1",
+          "Character": "Player",
+          "Hint": "Okay, please contact us for our next visit. This call letter contains our contact information. We will proceed to check the surrounding area.",
+          "Clue": "The domestic helper refuses your entry. What should you tell her?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "contact us",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "call letter",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "surrounding area",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Close Door",
+          "Script_ID": "2.11",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Close Door",
+      "Script_ID": "2.11",
+      "Events": [
+        {
+          "Event_ID": "2.11.1",
+          "Character": "Domestic Helper",
+          "Hint": "[Domestic helper refuses entry.]",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "WaitForDirectorPlayer"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "check the surroundings",
+          "Script_ID": "7.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Dog",
+      "Script_ID": "2.12",
+      "Events": [
+        {
+          "Event_ID": "2.12.0.1",
+          "Character": "Domestic Helper",
+          "Hint": "[Dog is barking.]",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "WaitForDirectorPlayer"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        },
+        {
+          "Event_ID": "2.12.0.2",
+          "Character": "Player",
+          "Hint": "If you have a dog please leash it. Thank you.",
+          "Clue": "What are you hearing now? What should you say to ensure your safety?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "dog",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "leash",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Owner Leash Dog",
+          "Script_ID": "2.13",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Owner Leash Dog",
+      "Script_ID": "2.13",
+      "Events": [
+        {
+          "Event_ID": "2.13.0.1",
+          "Character": "Domestic Helper",
+          "Hint": "Sure.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        },
+        {
+          "Event_ID": "2.13.0.2",
+          "Character": "Domestic Helper",
+          "Hint": "[Domestic helper is leashing the dog.]",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "WaitForDirectorPlayer"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        },
+        {
+          "Event_ID": "2.13.0.3",
+          "Character": "Domestic Helper",
+          "Hint": "Done, please enter!",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Check House",
+          "Script_ID": "4.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Check Surrounding Area",
+      "Script_ID": "7.1",
+      "Events": [
+        {
+          "Event_ID": "7.1.1",
+          "Character": "Player",
+          "Hint": "[Check surrounding area for mosquito breeding.]",
+          "Clue": "What should you do inside the surrounding area?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "OutSide_No_Breeding",
+          "Script_ID": "7.2.1",
+          "Is_Path": "False"
+        },
+        {
+          "Condition": "OutSide_Has_Breeding",
+          "Script_ID": "7.2.2",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Flowerpot Has No Breeding",
+      "Script_ID": "7.2.1",
+      "Events": [
+        {
+          "Event_ID": "7.2.1.1",
+          "Character": "Player",
+          "Hint": "There is no mosquito breeding here.",
+          "Clue": "What should you say after no mosquito breeding is found?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "no mosquito breeding",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Move on",
+          "Script_ID": "7.4",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Flowerpot Has Potentially Mosquito Breeding",
+      "Script_ID": "7.2.2",
+      "Events": [
+        {
+          "Event_ID": "7.2.2.1",
+          "Character": "Player",
+          "Hint": "There is a potential mosquito breeding here.",
+          "Clue": "What do you say after you spot a potential mosquito breeding?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "potential mosquito breeding",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Ring bell to get owner",
+          "Script_ID": "7.3.3",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Ring Door Bell",
+      "Script_ID": "7.3.3",
+      "Events": [
+        {
+          "Event_ID": "7.3.3.1",
+          "Character": "Player",
+          "Hint": "[Ring doorbell to call domestic helper's attention.]",
+          "Clue": "What should you do after potential mosquito breeding is found?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "7.3.3.2",
+          "Character": "Player",
+          "Hint": "Madam, I found potential mosquito breeding in the surrounding area. I will need to collect a sample.",
+          "Clue": "What do you say after you spot a potential mosquito breeding?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "potential mosquito breeding",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "collect",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "sample",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Go Back To Flowerpots",
+          "Script_ID": "7.2.4",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Go Back To Flowerpots",
+      "Script_ID": "7.2.4",
+      "Events": [
+        {
+          "Event_ID": "7.2.4.1",
+          "Character": "Player",
+          "Hint": "[Go back to surrounding area as the domestic helper follows you.]",
+          "Clue": "What should you do after potential mosquito breeding is found?",
+          "Action": [
+            {
+              "Type": "Other",
+              "Score": "0"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Show empty vial and pipette",
+          "Script_ID": "7.2.5",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Show Empty Vial and Pipette",
+      "Script_ID": "7.2.5",
+      "Events": [
+        {
+          "Event_ID": "7.2.5.1",
+          "Character": "Player",
+          "Hint": "[Show empty vial and pipette.]",
+          "Clue": "What should you show for breeding sample collection?",
+          "Action": [
+            {
+              "Type": "ShowItem"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "7.2.5.2",
+          "Character": "Player",
+          "Hint": "I'll collect the sample with this pipette and deposit it into this empty vial.",
+          "Clue": "What should you say after showing the empty vial and pipette?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "collect",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "sample",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "pipette",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "empty vial",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Collect sample and deposit in empty vial",
+          "Script_ID": "7.2.6",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Collect Sample and Deposit in Empty Vial",
+      "Script_ID": "7.2.6",
+      "Events": [
+        {
+          "Event_ID": "7.2.6.1",
+          "Character": "Player",
+          "Hint": "[Collect sample and deposit in empty vial.]",
+          "Clue": "What should you do after showing the empty vial and pipette?",
+          "Action": [
+            {
+              "Type": "Button",
+              "Score": "3"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Provide identity card",
+          "Script_ID": "9.1.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Provides Identity Card",
+      "Script_ID": "9.1.1",
+      "Events": [
+        {
+          "Event_ID": "9.1.1.1",
+          "Character": "Player",
+          "Hint": "Madam, I will now seal the vial with a tamper proof sticker and label it.",
+          "Clue": "What should you say after collecting the mosquito breeding sample?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "seal ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "label ",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "9.1.1.2",
+          "Character": "Player",
+          "Hint": "May I have your particulars please?",
+          "Clue": "What do you need from the domestic helper before sealing the label?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "particulars ",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "9.1.1.3",
+          "Character": "Player",
+          "Hint": "[Take identity card from domestic helper.]",
+          "Clue": "What should you take from the domestic helper before sealing the label?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "9.1.1.4",
+          "Character": "Domestic Helper",
+          "Hint": "Why do you need to seal it?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "9.1.1.5",
+          "Character": "Player",
+          "Hint": "To ensure the sample collected is not tampered.",
+          "Clue": "Why do you need to seal the sample?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "not tampered",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "9.1.1.6",
+          "Character": "Player",
+          "Hint": "[Seal and label vial in front of domestic helper.]",
+          "Clue": "After getting the particulars, what do you do with the vial?",
+          "Action": [
+            {
+              "Type": "Button",
+              "Score": "3"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "9.1.1.7",
+          "Character": "Player",
+          "Hint": "[Return identity card to domestic helper.]",
+          "Clue": "What should you do after sealing the vial?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Why do you need to take a sample",
+          "Script_ID": "9.2",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Why Collect Sample",
+      "Script_ID": "9.2",
+      "Events": [
+        {
+          "Event_ID": "9.2.0",
+          "Character": "Domestic Helper",
+          "Hint": "Why do you need to collect a sample?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "9.2.1",
+          "Character": "Player",
+          "Hint": "Madam, it is to send it for lab tests. To determine if it is a mosquito breeding. If it is, what species.",
+          "Clue": "Why do you need to collect a sample?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "lab",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "mosquito breeding",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "species",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "9.2.2",
+          "Character": "Domestic Helper",
+          "Hint": "Why do you need to find out if it is a mosquito breeding and its species?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "9.2.3",
+          "Character": "Player",
+          "Hint": "To confirm if it is a breeding of a vector that spreads diseases.",
+          "Clue": "Why do you need to confirm the vector species?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "vector that spreads diseases",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "fine me outside",
+          "Script_ID": "15.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Fine (Outside)",
+      "Script_ID": "15.1",
+      "Events": [
+        {
+          "Event_ID": "15.1.1",
+          "Character": "Domestic Helper",
+          "Hint": "So what will happen after the sample identification? Will you fine me straight away?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "15.1.2",
+          "Character": "Player",
+          "Hint": "Madam, when the lab results are ready, my office will notify you of the follow up. It may possibly include enforcement if the sample is of a vector.",
+          "Clue": "What happens after sample identification? Will there be a fine?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "lab results ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "notify",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "follow up",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "enforcement",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "vector",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "15.1.3",
+          "Character": "Domestic Helper",
+          "Hint": "If there is a fine, how much would it be?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "15.1.4",
+          "Character": "Player",
+          "Hint": "The amount would be two hundred or three hundred dollars for the first offence.",
+          "Clue": "How much is the fine based on what you found?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "two hundred or three hundred dollars",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "first",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Owner_Not_Appeal",
+          "Script_ID": "15.2",
+          "Is_Path": "False"
+        },
+        {
+          "Condition": "Owner_Appeal",
+          "Script_ID": "15.2.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Accept (Outside)",
+      "Script_ID": "15.2",
+      "Events": [
+        {
+          "Event_ID": "15.2.1",
+          "Character": "Domestic Helper",
+          "Hint": "Okay.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "complete inspection outside",
+          "Script_ID": "8.5",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Appeal (Outside)",
+      "Script_ID": "15.2.1",
+      "Events": [
+        {
+          "Event_ID": "15.2.1",
+          "Character": "Domestic Helper",
+          "Hint": "That is crazy! I want to appeal. Pass me the contact.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "15.2.2",
+          "Character": "Player",
+          "Hint": "You may use our E services, or call our NEA Hotline at 6225 5632 for assistance.",
+          "Clue": "What is the correct mode for appeals?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "E services ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "call ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "NEA Hotline",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "15.2.3",
+          "Character": "Domestic Helper",
+          "Hint": "Okay, thank you.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "complete inspection outside",
+          "Script_ID": "8.5",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Move On",
+      "Script_ID": "7.4",
+      "Events": [
+        {
+          "Event_ID": "7.4.1",
+          "Character": "Agent",
+          "Hint": "There is nothing here, too. Let us move on.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Place Call letter in letter box",
+          "Script_ID": "7.6",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Place Call Letter in Letter Box",
+      "Script_ID": "7.6",
+      "Events": [
+        {
+          "Event_ID": "7.6.0.1",
+          "Character": "Player",
+          "Hint": "[Place Call Letter into the letter box for owner or occupier to contact NEA.]",
+          "Clue": "What is something you can issue to help you enter the house on your next visit?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Done",
+          "Script_ID": "7.6.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Done",
+      "Script_ID": "7.6.1",
+      "Events": [
+        {
+          "Event_ID": "7.6.1",
+          "Character": "Agent",
+          "Hint": "Done, let’s go.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Complete",
+          "Script_ID": "Finish",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Collect Sample",
+      "Script_ID": "7.3.2",
+      "Events": [
+        {
+          "Event_ID": "7.3.2.1",
+          "Character": "Domestic Helper",
+          "Hint": "Sure.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "7.3.2.2",
+          "Character": "Player",
+          "Hint": "[Collect the mosquito breeding sample with pipette, Deposit the sample into the empty vial, and seal and label the vial in front of witness.]",
+          "Clue": "What are the steps you should perform after finding potential mosquito breeding?",
+          "Action": [
+            {
+              "Type": "Button"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Place Call letter",
+          "Script_ID": "7.7",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Place Call Letter",
+      "Script_ID": "7.7",
+      "Events": [
+        {
+          "Event_ID": "7.7.1",
+          "Character": "Player",
+          "Hint": "[Place Call letter and Breeding Notice into the letter box for owner or occupier to contact NEA.]",
+          "Clue": "What is something you can issue to help you enter the house on your next visit?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Done",
+          "Script_ID": "7.6.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Complete Inspection (Outside)",
+      "Script_ID": "8.5",
+      "Events": [
+        {
+          "Event_ID": "8.5.1",
+          "Character": "Player",
+          "Hint": "Madam, I have completed the inspection. As mentioned earlier, the breeding sample will be sent to the lab for testing, to identify if it is a mosquito breeding. If found to be so, there could be a fine. Thank you for your cooperation.",
+          "Clue": "What should you say once you have completed the inspection?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "completed",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "breeding sample",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "lab for testing",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "mosquito breeding",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "fine",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "Thank you",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "ground floor of the block always got mosquitoes",
+          "Script_ID": "8.2.1",
+          "Is_Path": "True"
+        },
+        {
+          "Condition": "Thank you. Goodbye.",
+          "Script_ID": "8.2.2",
+          "Is_Path": "False"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Check Roof Gutters",
+      "Script_ID": "8.1",
+      "Events": [
+        {
+          "Event_ID": "8.1.1",
+          "Character": "Player",
+          "Hint": "Madam, do you have any roof gutters?",
+          "Clue": "Where else do you need to check for potential mosquito breeding?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "roof gutters",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "8.1.2",
+          "Character": "Domestic Helper",
+          "Hint": "Yes, we have. Please follow me.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "8.1.2.1",
+          "Character": " ",
+          "Hint": "[Follow the domestic helper.]",
+          "Clue": "[Follow the domestic helper.]",
+          "Action": [
+            {
+              "Type": "Wait_Player_Walk_To"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "8.1.3",
+          "Character": "Player",
+          "Hint": "How do you maintain them?",
+          "Clue": "What is the critical thing for the owner/occupier to do when they have roof gutters?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "maintain",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "8.1.4",
+          "Character": "Domestic Helper",
+          "Hint": "We have a contractor that clears the debris from the gutter once every two weeks to make sure the water is not obstructed.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "8.15",
+          "Character": "Player",
+          "Hint": "Madam, I have completed the inspection. As mentioned earlier, the breeding sample will be sent to the lab for testing, to identify if it is a mosquito breeding. If found to be so, there could be a fine. Thank you for your cooperation.",
+          "Clue": "What should you say once you have completed the inspection?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "completed ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "breeding sample",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "lab for testing",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "mosquito breeding",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "fine",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "Thank you",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "ground floor of the block always got mosquitoes",
+          "Script_ID": "8.2.1",
+          "Is_Path": "True"
+        },
+        {
+          "Condition": "Thank you. Goodbye",
+          "Script_ID": "8.2.2",
+          "Is_Path": "False"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Ground floor of the block always got mosquitoes",
+      "Script_ID": "8.2.1",
+      "Events": [
+        {
+          "Event_ID": "8.2.1.1",
+          "Character": "Domestic Helper",
+          "Hint": "By the way, since you are here, I would like to let you know that the playground in the park always got mosquitoes.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "submit any feedback",
+          "Script_ID": "8.3",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Thank You. Goodbye",
+      "Script_ID": "8.2.2",
+      "Events": [
+        {
+          "Event_ID": "8.2.2.1",
+          "Character": "Domestic Helper",
+          "Hint": "Thank you. Goodbye.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Complete",
+          "Script_ID": "Finish",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Submit Feedback",
+      "Script_ID": "8.3",
+      "Events": [
+        {
+          "Event_ID": "8.3.1",
+          "Character": "Player",
+          "Hint": "You can submit your feedback to NEA via our mobile apps, or call our hotline at 6225 5632, so that your feedback will be recorded in our systems and sent to the correct team for follow up. You will also receive an official reply.",
+          "Clue": "What methods are available for the public to provide feedback to NEA, and why do you recommend them?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "submit ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "apps",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "hotline",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "recorded",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "sent",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "official reply",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Take Feedback",
+          "Script_ID": "8.4",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Take Feedback",
+      "Script_ID": "8.4",
+      "Events": [
+        {
+          "Event_ID": "8.4.1",
+          "Character": "Domestic Helper",
+          "Hint": "Why can't you take my feedback now, since I'm telling you now?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "8.4.2",
+          "Character": "Player",
+          "Hint": "In that case, I will take down your feedback now, and pass it to my Team Leader.",
+          "Clue": "What should you say if you need to record feedback on the spot?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "take down",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "pass",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "Team Leader",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Complete",
+          "Script_ID": "Finish",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Check House",
+      "Script_ID": "4.1",
+      "Events": [
+        {
+          "Event_ID": "4.1.1",
+          "Character": "Player",
+          "Hint": "Madam, I need to check your bedroom, living room, kitchen, and toilets.",
+          "Clue": "What are the areas will inspect?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "bedroom",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "living room",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "kitchen",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "toilets",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        },
+        {
+          "Event_ID": "4.1.2",
+          "Character": "Domestic Helper",
+          "Hint": "I have two toilets.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        },
+        {
+          "Event_ID": "4.1.3",
+          "Character": "Player",
+          "Hint": "Could you accompany me please?",
+          "Clue": "Do you enter the house by yourself?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "accompany ",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        },
+        {
+          "Event_ID": "4.1.4",
+          "Character": "Domestic Helper",
+          "Hint": "Sure.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Outside"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Living Room_No_Breeding",
+          "Script_ID": "4.5.1",
+          "Is_Path": "False"
+        },
+        {
+          "Condition": "Living Room_Has_Breeding",
+          "Script_ID": "4.5.2",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Living Room Has No Mosquito Breeding",
+      "Script_ID": "4.5.1",
+      "Events": [
+        {
+          "Event_ID": "4.5.1.1",
+          "Character": "Player",
+          "Hint": "[Check living room for mosquito breeding.]",
+          "Clue": "What should you do inside the living room?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        },
+        {
+          "Event_ID": "4.5.1.2",
+          "Character": "Player",
+          "Hint": "There is no mosquito breeding here.",
+          "Clue": "What should you say after no mosquito breeding is found?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "no mosquito breeding",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Encounter Locked Bedroom",
+          "Script_ID": "2.21",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Encounter Locked Bedroom",
+      "Script_ID": "2.21",
+      "Events": [
+        {
+          "Event_ID": "2.21.1",
+          "Character": "Player",
+          "Hint": "[Look for locked bedroom.]",
+          "Clue": "Is there a locked room in the house?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom Door"
+        },
+        {
+          "Event_ID": "2.21.2",
+          "Character": "Player",
+          "Hint": "Madam, this room is closed. Could you open this room for me?",
+          "Clue": "What should you do to enter the locked bedroom?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "open",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom Door"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Owner_Unlock_Bedroom",
+          "Script_ID": "2.21.3",
+          "Is_Path": "True"
+        },
+        {
+          "Condition": "Owner_Reject_Unlock_Bedroom",
+          "Script_ID": "2.21.4",
+          "Is_Path": "False"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Unlock Bedroom",
+      "Script_ID": "2.21.3",
+      "Events": [
+        {
+          "Event_ID": "2.21.3.1",
+          "Character": "Domestic Helper",
+          "Hint": "Sure.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom Door"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Bedroom_Has_Breeding",
+          "Script_ID": "2.21.5",
+          "Is_Path": "False"
+        },
+        {
+          "Condition": "Bedroom_No_Breeding",
+          "Script_ID": "2.21.6",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Bedroom Has No Breeding ",
+      "Script_ID": "2.21.6",
+      "Events": [
+        {
+          "Event_ID": "2.21.6.1",
+          "Character": "Player",
+          "Hint": "[Check locked bedroom for mosquito breeding.]",
+          "Clue": "What should you do inside the locked bedroom?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "2.21.6.2",
+          "Character": "Player",
+          "Hint": "There is no mosquito breeding here.",
+          "Clue": "What should you say after no mosquito breeding is found?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "no mosquito breeding",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": [
+            "Kitchen_Has_Breeding",
+            "Toilet_1_Has_Breeding",
+            "Toilet_2_Has_Breeding"
+          ],
+          "Script_ID": "5.1",
+          "Is_Path": "False"
+        },
+        {
+          "Condition": [
+            "Kitchen_No_Breeding",
+            "Toilet_1_No_Breeding",
+            "Toilet_2_No_Breeding"
+          ],
+          "Script_ID": "6.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Bedroom Has Potential Breeding",
+      "Script_ID": "2.21.5",
+      "Events": [
+        {
+          "Event_ID": "2.21.5.1",
+          "Character": "Player",
+          "Hint": "[Check locked bedroom for mosquito breeding.]",
+          "Clue": "What should you do inside the locked bedroom?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "2.21.5.2",
+          "Character": "Player",
+          "Hint": "I have found a potential mosquito breeding. I will need to collect a sample.",
+          "Clue": "What do you say after you spot a potential mosquito breeding?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "potential mosquito breeding",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "collect",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "sample",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "2.21.5.3",
+          "Character": "Domestic Helper",
+          "Hint": "Why do you need to collect a sample?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "2.21.5.4",
+          "Character": "Player",
+          "Hint": "It is to send it for lab tests. To determine if it is a mosquito breeding. If it is, what species.",
+          "Clue": "Why do you need to collect a sample?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "lab",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "mosquito breeding",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "species",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "2.21.5.5",
+          "Character": "Domestic Helper",
+          "Hint": "Why do you need to find out if it is a mosquito breeding and its species?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "2.21.5.6",
+          "Character": "Player",
+          "Hint": "To confirm if it is a breeding of a vector that spreads diseases.",
+          "Clue": "Why do you need to confirm the vector species?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "vector that spreads diseases",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "2.21.5.7",
+          "Character": "Domestic Helper",
+          "Hint": "Sure.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "2.21.5.8",
+          "Character": "Player",
+          "Hint": "[Show empty vial and pipette.]",
+          "Clue": "What should you show for breeding sample collection?",
+          "Action": [
+            {
+              "Type": "ShowItem"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "2.21.5.9",
+          "Character": "Player",
+          "Hint": "I’ll collect the sample with this pipette and deposit the sample into this empty vial.",
+          "Clue": "What should you say after showing the empty vial and pipette?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "collect",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "sample",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "pipette",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "empty vial",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "2.21.5.10",
+          "Character": "Player",
+          "Hint": "[Collect sample and deposit into the empty vial.]",
+          "Clue": "What should you do after showing the empty vial and pipette?",
+          "Action": [
+            {
+              "Type": "Button",
+              "Score": "3"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "2.21.5.11",
+          "Character": "Domestic Helper",
+          "Hint": "Sure.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Provides identity card",
+          "Script_ID": "9.1.2",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Provides Identity Card",
+      "Script_ID": "9.1.2",
+      "Events": [
+        {
+          "Event_ID": "9.1.2.1",
+          "Character": "Player",
+          "Hint": "Madam, I will now seal the vial with a tamper proof sticker and label it.",
+          "Clue": "What should you say after collecting the mosquito breeding sample?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "seal ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "label ",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "9.1.2.2",
+          "Character": "Player",
+          "Hint": "May I have your particulars please?",
+          "Clue": "What do you need from the domestic helper before sealing the label?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "particulars ",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "9.1.2.3",
+          "Character": "Player",
+          "Hint": "[Take identity card from domestic helper.]",
+          "Clue": "What should you take from the domestic helper before sealing the label?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "9.1.2.4",
+          "Character": "Domestic Helper",
+          "Hint": "Why do you need to seal it?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "9.1.2.5",
+          "Character": "Player",
+          "Hint": "To ensure the sample collected is not tampered.",
+          "Clue": "Why do you need to seal the sample?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "not tampered",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "9.1.2.6",
+          "Character": "Player",
+          "Hint": "[Seal and label vial in front of domestic helper.]",
+          "Clue": "After getting the particulars, what do you do with the vial?",
+          "Action": [
+            {
+              "Type": "Button",
+              "Score": "3"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        },
+        {
+          "Event_ID": "9.1.2.7",
+          "Character": "Player",
+          "Hint": "[Return identity card to domestic helper.]",
+          "Clue": "What should you do after sealing the vial?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": [
+            "Kitchen_Has_Breeding",
+            "Toilet_1_Has_Breeding",
+            "Toilet_2_Has_Breeding"
+          ],
+          "Script_ID": "5.1",
+          "Is_Path": "False"
+        },
+        {
+          "Condition": [
+            "Kitchen_No_Breeding",
+            "Toilet_1_No_Breeding",
+            "Toilet_2_No_Breeding"
+          ],
+          "Script_ID": "6.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Reject To Unlock Bedroom",
+      "Script_ID": "2.21.4",
+      "Events": [
+        {
+          "Event_ID": "2.21.4.1",
+          "Character": "Domestic Helper",
+          "Hint": "No, I cannot. The room is tenanted out.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom Door"
+        },
+        {
+          "Event_ID": "2.21.4.2",
+          "Character": "Player",
+          "Hint": "Noted. Let your tenant know we want to inspect it. Please arrange an inspection with NEA again.",
+          "Clue": "The bedroom cannot be opened. What do you advise?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "tenant",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "inspect",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "arrange",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "inspection",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Bedroom Door"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": [
+            "Kitchen_Has_Breeding",
+            "Toilet_1_Has_Breeding",
+            "Toilet_2_Has_Breeding"
+          ],
+          "Script_ID": "5.1",
+          "Is_Path": "False"
+        },
+        {
+          "Condition": [
+            "Kitchen_No_Breeding",
+            "Toilet_1_No_Breeding",
+            "Toilet_2_No_Breeding"
+          ],
+          "Script_ID": "6.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Living room Has Potential Mosquito",
+      "Script_ID": "4.5.2",
+      "Events": [
+        {
+          "Event_ID": "4.5.2.1",
+          "Character": "Player",
+          "Hint": "[Check living room for mosquito breeding.]",
+          "Clue": "What should you do inside the living room?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        },
+        {
+          "Event_ID": "4.5.2.2",
+          "Character": "Player",
+          "Hint": "Madam, I have found a potential mosquito breeding. I will need to collect a sample.",
+          "Clue": "What do you say after you spot a potential mosquito breeding?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "potential mosquito breeding",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "collect ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "sample",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Why do you need to a sample?",
+          "Script_ID": "4.6",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Why Collect Sample",
+      "Script_ID": "4.6",
+      "Events": [
+        {
+          "Event_ID": "4.6.1",
+          "Character": "Domestic Helper",
+          "Hint": "Why do you need to collect a sample?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        },
+        {
+          "Event_ID": "4.6.2",
+          "Character": "Player",
+          "Hint": "It is to send it for lab tests. To determine if it is a mosquito breeding. If it is, what species.",
+          "Clue": "Why do you need to collect a sample?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "lab",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "mosquito breeding",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "species",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        },
+        {
+          "Event_ID": "4.6.3",
+          "Character": "Domestic Helper",
+          "Hint": "Why do you need to find out if it is a mosquito breeding and its species?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        },
+        {
+          "Event_ID": "4.6.4",
+          "Character": "Player",
+          "Hint": "To confirm if it is a breeding of a vector that spreads diseases.",
+          "Clue": "Why do you need to confirm the vector species?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "vector that spreads diseases",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        },
+        {
+          "Event_ID": "4.6.5",
+          "Character": "Domestic Helper",
+          "Hint": "Sure.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        },
+        {
+          "Event_ID": "4.6.6",
+          "Character": "Player",
+          "Hint": "[Show empty vial and pipette.]",
+          "Clue": "What should you show for breeding sample collection?",
+          "Action": [
+            {
+              "Type": "ShowItem"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        },
+        {
+          "Event_ID": "4.6.7",
+          "Character": "Player",
+          "Hint": "I'll collect the sample with this pipette and deposit it into this empty vial.",
+          "Clue": "What should you say after showing the empty vial and pipette?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "collect",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "sample",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "pipette",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "empty vial",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        },
+        {
+          "Event_ID": "4.6.8",
+          "Character": "Player",
+          "Hint": "[Collect sample and deposit into the empty vial.]",
+          "Clue": "What should you do after showing the empty vial and pipette?",
+          "Action": [
+            {
+              "Type": "Button",
+              "Score": "3"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        },
+        {
+          "Event_ID": "4.6.9",
+          "Character": "Domestic Helper",
+          "Hint": "Sure.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Provides identity card",
+          "Script_ID": "9.1.4",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Provides Identity Card",
+      "Script_ID": "9.1.4",
+      "Events": [
+        {
+          "Event_ID": "9.1.4.1",
+          "Character": "Player",
+          "Hint": "Madam, I will now seal the vial with a tamper proof sticker and label it.",
+          "Clue": "What should you say after collecting the mosquito breeding sample?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "seal ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "label ",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        },
+        {
+          "Event_ID": "9.1.4.2",
+          "Character": "Player",
+          "Hint": "May I have your particulars please?",
+          "Clue": "What do you need from the domestic helper before sealing the label?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "particulars ",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        },
+        {
+          "Event_ID": "9.1.4.3",
+          "Character": "Player",
+          "Hint": "[Take identity card from domestic helper.]",
+          "Clue": "What should you take from the domestic helper before sealing the label?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        },
+        {
+          "Event_ID": "9.1.4.4",
+          "Character": "Domestic Helper",
+          "Hint": "Why do you need to seal it?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        },
+        {
+          "Event_ID": "9.1.4.5",
+          "Character": "Player",
+          "Hint": "To ensure the sample collected is not tampered.",
+          "Clue": "Why do you need to seal the sample?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "not tampered",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        },
+        {
+          "Event_ID": "9.1.4.6",
+          "Character": "Player",
+          "Hint": "[Seal and label vial in front of domestic helper.]",
+          "Clue": "After getting the particulars, what do you do with the vial?",
+          "Action": [
+            {
+              "Type": "Button",
+              "Score": "3"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        },
+        {
+          "Event_ID": "9.1.4.7",
+          "Character": "Player",
+          "Hint": "[Return identity card to domestic helper.]",
+          "Clue": "What should you do after sealing the vial?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Living Room"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Encounter Locked Bedroom",
+          "Script_ID": "2.21",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Potential Mosquito Breeding in Kitchen, Toilets",
+      "Script_ID": "5.1",
+      "Events": [
+        {
+          "Event_ID": "5.1.1",
+          "Character": "Player",
+          "Hint": "[Check kitchen and/or toilet(s) for mosquito breeding.]",
+          "Clue": "What should you do inside the kitchen and/or toilet(s)?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "5.1.2",
+          "Character": "Player",
+          "Hint": "Madam, I have found a potential mosquito breeding. I will need to collect a sample.",
+          "Clue": "What do you say after you spot a potential mosquito breeding?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "potential mosquito breeding ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "collect ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "sample",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "5.1.3",
+          "Character": "Domestic Helper",
+          "Hint": "Why do you need to collect a sample?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "5.1.4",
+          "Character": "Player",
+          "Hint": "It is to send it for lab tests to determine if it is a mosquito breeding. If it is, what species.",
+          "Clue": "Why do you need to collect a sample?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "lab",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "mosquito breeding",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "species",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "5.1.5",
+          "Character": "Domestic Helper",
+          "Hint": "Why do you need to find out if it is a mosquito breeding and its species?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "5.1.6",
+          "Character": "Player",
+          "Hint": "To confirm if it is a breeding of a vector that spreads diseases.",
+          "Clue": "Why do you need to confirm the vector species?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "vector that spreads diseases",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "5.1.7",
+          "Character": "Domestic Helper",
+          "Hint": "Sure.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "5.1.8",
+          "Character": "Player",
+          "Hint": "[Show empty vial and pipette.]",
+          "Clue": "What should you show for breeding sample collection?",
+          "Action": [
+            {
+              "Type": "ShowItem"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "5.1.8.1",
+          "Character": "Player",
+          "Hint": "I’ll collect the sample with this pipette and deposit it into this empty vial.",
+          "Clue": "What should you say after showing the empty vial and pipette?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "collect",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "sample",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "pipette",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "empty vial",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "5.1.9",
+          "Character": "Player",
+          "Hint": "[Collect sample and deposit into the empty vial.]",
+          "Clue": "What should you do after showing the empty vial and pipette?",
+          "Action": [
+            {
+              "Type": "Button",
+              "Score": "3"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "5.1.10",
+          "Character": "Domestic Helper",
+          "Hint": "Sure.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Provides identity card",
+          "Script_ID": "9.1.3",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Provides Identity Card",
+      "Script_ID": "9.1.3",
+      "Events": [
+        {
+          "Event_ID": "9.1.3.1",
+          "Character": "Player",
+          "Hint": "Madam, I will now seal the vial with a tamper proof sticker and label it.",
+          "Clue": "What should you say after collecting the mosquito breeding sample?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "seal ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "label ",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "9.1.3.2",
+          "Character": "Player",
+          "Hint": "May I have your particulars please?",
+          "Clue": "What do you need from the domestic helper before sealing the label?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "particulars ",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "9.1.3.3",
+          "Character": "Player",
+          "Hint": "[Take identity card from domestic helper.]",
+          "Clue": "What should you take from the domestic helper before sealing the label?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "9.1.3.4",
+          "Character": "Domestic Helper",
+          "Hint": "Why do you need to seal it?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "9.1.3.5",
+          "Character": "Player",
+          "Hint": "To ensure the sample collected is not tampered.",
+          "Clue": "Why do you need to seal the sample?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "not tampered",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "9.1.3.6",
+          "Character": "Player",
+          "Hint": "[Seal and label vial in front of domestic helper.]",
+          "Clue": "After getting the particulars, what do you do with the vial?",
+          "Action": [
+            {
+              "Type": "Button",
+              "Score": "3"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "9.1.3.7",
+          "Character": "Player",
+          "Hint": "[Return identity card to domestic helper.]",
+          "Clue": "What should you do after sealing the vial?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Garden_Has_Breeding",
+          "Script_ID": "11.5.2",
+          "Is_Path": "False"
+        },
+        {
+          "Condition": "Garden_No_Breeding",
+          "Script_ID": "11.5.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Front and Back Yard Has No Mosquito Breeding",
+      "Script_ID": "11.5.1",
+      "Events": [
+        {
+          "Event_ID": "11.5.1.1",
+          "Character": "Player",
+          "Hint": "[Check front yard for mosquito breeding.]",
+          "Clue": "What should you do inside the front yard?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Garden"
+        },
+        {
+          "Event_ID": "11.5.1.2",
+          "Character": "Player",
+          "Hint": "There is no mosquito breeding here.",
+          "Clue": "What should you say after no mosquito breeding is found?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "no mosquito breeding",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Garden"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "OutSide_No_Breeding",
+          "Script_ID": "13.2.1",
+          "Is_Path": "False"
+        },
+        {
+          "Condition": "OutSide_Has_Breeding",
+          "Script_ID": "13.2.2",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Front and Back Yard Has Potential Mosquito Breeding",
+      "Script_ID": "11.5.2",
+      "Events": [
+        {
+          "Event_ID": "11.5.2.1",
+          "Character": "Player",
+          "Hint": "[Check front yard for mosquito breeding.]",
+          "Clue": "What should you do inside the front yard?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Garden"
+        },
+        {
+          "Event_ID": "11.5.2.2",
+          "Character": "Player",
+          "Hint": "Madam, I have found a potential mosquito breeding. I will need to collect a sample.",
+          "Clue": "What do you say after you spot a potential mosquito breeding?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "potential mosquito breeding",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "collect ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "sample",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Garden"
+        },
+        {
+          "Event_ID": "11.5.2.3",
+          "Character": "Player",
+          "Hint": "[Show empty vial and pipette.]",
+          "Clue": "What should you show for breeding sample collection?",
+          "Action": [
+            {
+              "Type": "ShowItem"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Garden"
+        },
+        {
+          "Event_ID": "11.5.2.3.1",
+          "Character": "Player",
+          "Hint": "I’ll collect the sample with this pipette and deposit it into this empty vial.",
+          "Clue": "What should you say after showing the empty vial and pipette?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "collect ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "sample ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "pipette",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "empty vial",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Garden"
+        },
+        {
+          "Event_ID": "11.5.2.3.2",
+          "Character": "Player",
+          "Hint": "[Collect the mosquito breeding sample with pipette and deposit the sample into the empty vial.]",
+          "Clue": "What are the steps you should perform after finding potential mosquito breeding?",
+          "Action": [
+            {
+              "Type": "Button"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Garden"
+        },
+        {
+          "Event_ID": "11.5.2.4",
+          "Character": "Domestic Helper",
+          "Hint": "Sure.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Garden"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Provide identity card",
+          "Script_ID": "9.1.5",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Provides Identity Card",
+      "Script_ID": "9.1.5",
+      "Events": [
+        {
+          "Event_ID": "9.1.5.1",
+          "Character": "Player",
+          "Hint": "Madam, I will now seal the vial with a tamper proof sticker and label it.",
+          "Clue": "What should you say after collecting the mosquito breeding sample?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "seal ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "label ",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Garden"
+        },
+        {
+          "Event_ID": "9.1.5.2",
+          "Character": "Player",
+          "Hint": "May I have your particulars please?",
+          "Clue": "What do you need from the domestic helper before sealing the label?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "particulars ",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Garden"
+        },
+        {
+          "Event_ID": "9.1.5.3",
+          "Character": "Player",
+          "Hint": "[Take identity card from domestic helper.]",
+          "Clue": "What should you take from the domestic helper before sealing the label?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Garden"
+        },
+        {
+          "Event_ID": "9.1.5.4",
+          "Character": "Domestic Helper",
+          "Hint": "Why do you need to seal it?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Garden"
+        },
+        {
+          "Event_ID": "9.1.5.5",
+          "Character": "Player",
+          "Hint": "To ensure the sample collected is not tampered.",
+          "Clue": "Why do you need to seal the sample?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "not tampered",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Garden"
+        },
+        {
+          "Event_ID": "9.1.5.6",
+          "Character": "Player",
+          "Hint": "[Seal and label vial in front of domestic helper.]",
+          "Clue": "After getting the particulars, what do you do with the vial?",
+          "Action": [
+            {
+              "Type": "Button",
+              "Score": "3"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Garden"
+        },
+        {
+          "Event_ID": "9.1.5.7",
+          "Character": "Player",
+          "Hint": "[Return identity card to domestic helper.]",
+          "Clue": "What should you do after sealing the vial?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Garden"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "OutSide_No_Breeding",
+          "Script_ID": "13.2.1",
+          "Is_Path": "False"
+        },
+        {
+          "Condition": "OutSide_Has_Breeding",
+          "Script_ID": "13.2.2",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Check Surrounding Area",
+      "Script_ID": "13.1",
+      "Events": [
+        {
+          "Event_ID": "13.1.1",
+          "Character": "Player",
+          "Hint": "Lastly, let us check the surrounding area. Madam, do the flowerpots belong to you?",
+          "Clue": "You finished inspecting inside the house. Where else should you inspect?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "check",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "surrounding area",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "belong",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "13.1.2",
+          "Character": "Domestic Helper",
+          "Hint": "Yes, they belong to me.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "OutSide_No_Breeding",
+          "Script_ID": "13.2.1",
+          "Is_Path": "False"
+        },
+        {
+          "Condition": "OutSide_Has_Breeding",
+          "Script_ID": "13.2.2",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Flowerpots Has No Breeding",
+      "Script_ID": "13.2.1",
+      "Events": [
+        {
+          "Event_ID": "13.2.1.1",
+          "Character": "Player",
+          "Hint": "[Check surrounding area for mosquito breeding.]",
+          "Clue": "What should you do inside the surrounding area?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "13.2.1.2",
+          "Character": "Player",
+          "Hint": "There is no mosquito breeding here.",
+          "Clue": "What should you say after no mosquito breeding is found?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "no mosquito breeding",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "fine me",
+          "Script_ID": "14.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Flowerpots Has Potential Mosquito Breeding",
+      "Script_ID": "13.2.2",
+      "Events": [
+        {
+          "Event_ID": "13.2.2.1",
+          "Character": "Player",
+          "Hint": "[Check surrounding area for mosquito breeding.]",
+          "Clue": "What should you do inside the surrounding area?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "13.2.2.2",
+          "Character": "Player",
+          "Hint": "Madam, I have found a potential mosquito breeding. I will need to collect a sample.",
+          "Clue": "What do you say after you spot a potential mosquito breeding?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "potential mosquito breeding",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "collect ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "sample",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "13.2.2.3",
+          "Character": "Player",
+          "Hint": "[Show empty vial and pipette.]",
+          "Clue": "What should you show for breeding sample collection?",
+          "Action": [
+            {
+              "Type": "ShowItem"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "13.2.2.4",
+          "Character": "Player",
+          "Hint": "I’ll collect the sample with this pipette and deposit it into this empty vial.",
+          "Clue": "What should you say after showing the empty vial and pipette?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "collect ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "sample ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "pipette",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "empty vial",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "13.2.2.5",
+          "Character": "Player",
+          "Hint": "[Collect sample and deposit it into the empty vial.]",
+          "Clue": "What should you do after showing the empty vial and pipette?",
+          "Action": [
+            {
+              "Type": "Button",
+              "Score": "3"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "13.2.2.6",
+          "Character": "Domestic Helper",
+          "Hint": "Sure.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Provide identity card",
+          "Script_ID": "9.1.6",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Provides Identity Card",
+      "Script_ID": "9.1.6",
+      "Events": [
+        {
+          "Event_ID": "9.1.6.1",
+          "Character": "Player",
+          "Hint": "Madam, I will now seal the vial with a tamper proof sticker and label it.",
+          "Clue": "What should you say after collecting the mosquito breeding sample?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "seal ",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "label ",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "9.1.6.2",
+          "Character": "Player",
+          "Hint": "May I have your particulars please?",
+          "Clue": "What do you need from the domestic helper before sealing the label?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "particulars ",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "9.1.6.3",
+          "Character": "Player",
+          "Hint": "[Take identity card from domestic helper.]",
+          "Clue": "What should you take from the domestic helper before sealing the label?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "9.1.6.4",
+          "Character": "Domestic Helper",
+          "Hint": "Why do you need to seal it?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "9.1.6.5",
+          "Character": "Player",
+          "Hint": "To ensure the sample collected is not tampered.",
+          "Clue": "Why do you need to seal the sample?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "not tampered",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "9.1.6.6",
+          "Character": "Player",
+          "Hint": "[Seal and label vial in front of domestic helper.]",
+          "Clue": "After getting the particulars, what do you do with the vial?",
+          "Action": [
+            {
+              "Type": "Button",
+              "Score": "3"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        },
+        {
+          "Event_ID": "9.1.6.7",
+          "Character": "Player",
+          "Hint": "[Return identity card to domestic helper.]",
+          "Clue": "What should you do after sealing the vial?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "OutSide"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "fine me",
+          "Script_ID": "14.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Fine",
+      "Script_ID": "14.1",
+      "Events": [
+        {
+          "Event_ID": "14.1.1",
+          "Character": "Domestic Helper",
+          "Hint": "So what will happen after the sample identification? Will you fine me straight away?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "14.1.2",
+          "Character": "Player",
+          "Hint": "Madam, if the sample is identified as a vector, enforcement may be taken against you.",
+          "Clue": "What happens after sample identification? Will there be a fine?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "vector",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "enforcement",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "14.1.3",
+          "Character": "Domestic Helper",
+          "Hint": "If there is a fine, how much would it be?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "14.1.4",
+          "Character": "Player",
+          "Hint": "The amount would be two hundred or three hundred dollars for the first offence.",
+          "Clue": "How much is the fine based on what you found?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "two hundred or three hundred dollars",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": " first",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Owner_Not_Appeal",
+          "Script_ID": "14.2",
+          "Is_Path": "False"
+        },
+        {
+          "Condition": "Owner_Appeal",
+          "Script_ID": "14.2.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Accept",
+      "Script_ID": "14.2",
+      "Events": [
+        {
+          "Event_ID": "14.2.1",
+          "Character": "Domestic Helper",
+          "Hint": "Okay.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "roof_Check",
+          "Script_ID": "8.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "Appeal",
+      "Script_ID": "14.2.1",
+      "Events": [
+        {
+          "Event_ID": "14.2.1",
+          "Character": "Domestic Helper",
+          "Hint": "That is crazy! I want to appeal, pass me the contact.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "14.2.2",
+          "Character": "Player",
+          "Hint": "You may use our E services, or call our NEA Hotline at 6225 5632 for assistance.",
+          "Clue": "What is the correct mode for appeals?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "E services",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "call",
+              "Score": "1"
+            },
+            {
+              "Type": "Speech",
+              "Keywords": "NEA Hotline",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "14.2.3",
+          "Character": "Domestic Helper",
+          "Hint": "Why can’t you take my appeal now, since I’m telling you now?",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "14.2.4",
+          "Character": "Player",
+          "Hint": "Please write in to NEA.",
+          "Clue": "Why can't you take the appeal now?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "write in",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        },
+        {
+          "Event_ID": "14.2.5",
+          "Character": "Domestic Helper",
+          "Hint": "Okay, thank you.",
+          "Clue": "",
+          "Action": [
+            {
+              "Type": "Dialogue"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Ending"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "roof_Check",
+          "Script_ID": "8.1",
+          "Is_Path": "True"
+        }
+      ]
+    },
+    {
+      "Scenario_Title": "No Potential Mosquito Breeding in Kitchen, Toilets",
+      "Script_ID": "6.1",
+      "Events": [
+        {
+          "Event_ID": "6.1.1",
+          "Character": "Player",
+          "Hint": "[Check kitchen and/or toilet(s) for mosquito breeding.]",
+          "Clue": "What should you do inside the kitchen and/or toilet(s)?",
+          "Action": [
+            {
+              "Type": "Trigger",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        },
+        {
+          "Event_ID": "6.1.2",
+          "Character": "Player",
+          "Hint": "Madam, there is no mosquito breeding here.",
+          "Clue": "What should you say after no mosquito breeding is found?",
+          "Action": [
+            {
+              "Type": "Speech",
+              "Keywords": "no mosquito breeding",
+              "Score": "1"
+            }
+          ],
+          "Is_Critical_Point": "False",
+          "Time_Interval": "99",
+          "Location": "Kitchen, Toilet_1, Toilet_2"
+        }
+      ],
+      "Next_Script_Options": [
+        {
+          "Condition": "Garden_Has_Breeding",
+          "Script_ID": "11.5.2",
+          "Is_Path": "False"
+        },
+        {
+          "Condition": "Garden_No_Breeding",
+          "Script_ID": "11.5.1",
+          "Is_Path": "True"
+        }
+      ]
+    }
+  ]
+}
