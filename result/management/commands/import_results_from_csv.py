@@ -12,9 +12,10 @@ from result.models import Result, ResultBreakdown
 
 class Command(BaseCommand):
     def handle(self, **args):
-        # with open('C:/Users/vasan/Desktop/all_results.xlsx', 'r', encoding='Latin1') as f:
-        #     reader = csv.reader(f, dialect='excel')
-        xlsx_file = Path('C:/Users/vasan/Desktop/all_results.xlsx')
+        ResultBreakdown.objects.all().delete()
+        Result.objects.all().delete()
+
+        xlsx_file = Path('C:/Users/AVPL/Desktop/all_results.xlsx')
         wb_obj = openpyxl.load_workbook(xlsx_file)
         sheet = wb_obj.active
 
@@ -26,39 +27,44 @@ class Command(BaseCommand):
 
         # for row in reader:
             if counter != 0:
-                user = User.objects.get(username=row[1].value)
-                scenario = Scenario.objects.get(scenario_title=row[7].value)
-                result, created = Result.objects.get_or_create(
-                    uid=row[0].value,
+                # print("row 1: ", row[1].value)
+                user = User.objects.filter(username=row[1].value).first()
+                scenario = None
+                # print("row 7: ", row[7].value)
+                if row[7].value:
+                    scenario = Scenario.objects.filter(scenario_title=row[7].value).first()
+                if scenario and user:
+                    result = Result.objects.filter(
+                        uid=row[0].value
+                    ).first()
+                    if not result:
+                        result = Result.objects.create(uid=row[0].value, scenario=scenario, user=user)
+                        print(result, ' is created')
 
-                )
-                if created:
-                    print(result, ' is created')
-                    result.user = user
-                    result.scenario = scenario
+                        result.breeding_points = row[9].value
+                        result.breeding_points_found = row[10].value
+                        result.breeding_points_not_found = row[11].value
 
-                    result.breeding_points = row[9].value
-                    result.breeding_points_found = row[10].value
-                    result.breeding_points_not_found = row[11].value
+                        result.time_spend = row[12].value
+                        result.start_time = datetime.strptime(row[13].value, "%d/%m/%Y %H:%M") if row[13].value != '-' else None
+                        result.end_time = datetime.strptime(row[14].value, "%d/%m/%Y %H:%M") if row[14].value != '-' else None
+                        result.results = row[15].value
+                        result.is_pass = True if row[16].value == 'Passed' else False
+                        result.critical_failure = row[17].value
+                        result.is_completed = True if row[18].value == 'Completed' else False
+                        result.dateCreated = datetime.strptime(row[19].value, "%d/%m/%Y %H:%M") if row[19].value != '-' else None
 
-                    result.time_spend = row[12].value
-                    result.start_time = datetime.strptime(row[13].value, "%d/%m/%Y %H:%M")
-                    result.end_time = datetime.strptime(row[14].value, "%d/%m/%Y %H:%M")
-                    result.results = row[15].value
-                    result.is_pass = True if row[16].value == 'Passed' else False
-                    result.critical_failure = row[17].value
-                    result.is_completed = True if row[18].value == 'Completed' else False
-                    result.dateCreated = datetime.strptime(row[19].value, "%d/%m/%Y %H:%M")
-
-                    result.user_scores = row[20].value
-                    result.total_scores = row[21].value
-                    result.mac_id = row[22].value
-                    result.config = row[23].value
-                    result.passing_score = row[24].value
-                    result.teleport_path = row[25].value
-                    result.result_breakdown = row[26].value
-                    # result.dateCreated = row[18].value
-                    result.save()
-                else:
-                    print(result.id, ' is exists')
+                        result.user_scores = row[20].value
+                        result.total_scores = row[21].value
+                        result.mac_id = row[22].value if row[22].value else ""
+                        result.config = row[23].value
+                        result.passing_score = row[24].value
+                        result.teleport_path = row[25].value
+                        result.result_breakdown = row[26].value
+                        # result.dateCreated = row[18].value
+                        result.save()
+                        result.create_result_breakdown()
+                        print(result.uid, " result breakdown is created")
+                    else:
+                        print(result.id, ' is exists')
             counter += 1
