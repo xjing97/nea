@@ -138,7 +138,8 @@ def get_all_results(request):
         if sort_column not in ['results', 'critical_failure']:
             sort_column = Lower(sort_column)
         if not sorter_value['asc']:
-            sort_column = '-' + sort_column
+            sort_column = sort_column.desc()
+
     else:
         sort_column = '-date_created'
 
