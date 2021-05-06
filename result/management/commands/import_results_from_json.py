@@ -16,7 +16,7 @@ class Command(BaseCommand):
         Result.objects.all().delete()
 
         with open('C:/Users/AVPL/Desktop/consolidate_result.json') as f:
-            results = json.loads(f.read())
+            results = json.loads(f.read().encode('cp1252').decode('utf-8'))
 
             for data in results:
                 user = User.objects.filter(username=data['user__username'], soeId=data['user__soeId']).first()
