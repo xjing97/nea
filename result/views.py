@@ -390,6 +390,6 @@ def update_result_breakdown(request):
 @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
 def play_audio_file(request, path):
-    document_root = os.path.join(BASE_DIR, 'upload/audio/')
+    document_root = os.path.join(BASE_DIR, 'upload/upload/audio/')
 
     return serve(request, path, document_root=document_root, show_indexes=False)
