@@ -34,7 +34,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://192.168.1.83:3000",
     "http://localhost:8000",
-    "http://localhost"
+    "http://localhost",
+    "http://192.168.1.83"
 ]
 
 # Application definition
