@@ -34,6 +34,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://192.168.1.83:3000",
     "http://localhost:8000",
+    "http://localhost"
 ]
 
 # Application definition
@@ -155,8 +156,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/upload/'
-# MEDIA_URL = '/uploads/'
+STATIC_URL = 'static/'
+MEDIA_URL = 'upload/'
 
 AUTH_USER_MODEL = 'core.User'
 
@@ -164,4 +165,5 @@ STATICFILES_DIRS = (
     # os.path.join(BASE_DIR, 'upload'),
 )
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'upload')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'upload')

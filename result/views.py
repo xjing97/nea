@@ -139,7 +139,8 @@ def get_all_results(request):
         if sort_column not in ['results', 'critical_failure']:
             sort_column = Lower(sort_column)
         if not sorter_value['asc']:
-            sort_column = '-' + sort_column
+            sort_column = sort_column.desc()
+
     else:
         sort_column = '-date_created'
 
@@ -391,6 +392,6 @@ def update_result_breakdown(request):
 @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
 def play_audio_file(request, path):
-    document_root = os.path.join(BASE_DIR, 'upload/audio/')
+    document_root = os.path.join(BASE_DIR, 'upload/upload/audio/')
 
     return serve(request, path, document_root=document_root, show_indexes=False)
