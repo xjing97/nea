@@ -7,8 +7,8 @@ from distutils.util import strtobool
 from dateutil.relativedelta import relativedelta
 from django.core.paginator import Paginator
 from django.db.models import Q, DateTimeField, CharField, TimeField, F, Case, When, Value, ExpressionWrapper, \
-    DurationField
-from django.db.models.functions import Lower, Cast, TruncSecond, Extract
+    DurationField, DecimalField, FloatField
+from django.db.models.functions import Lower, Cast, TruncSecond, Extract, Round, Concat
 from django.shortcuts import render
 
 # Create your views here.
@@ -25,8 +25,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from nea.settings import BASE_DIR
 from nea.validator import ValidateIsAdmin
+from nea_helper.nea_helper import RoundWithPlaces
 from .models import Result, ResultBreakdown
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -109,6 +109,35 @@ def store_result(request):
     else:
         print('Scenario is invalid')
         return Response(status=400, data={'message': 'Scenario ID is invalid'})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_results(request):
+    user_id = request.user.id
+
+    user_results = Result.objects.filter(
+        user__id=user_id
+    ).annotate(
+        result_str=Concat(RoundWithPlaces(F('results'), 2), Value('%'), output_field=CharField()),
+        date_created=Cast(
+            TruncSecond('dateCreated', DateTimeField()), CharField()
+        ),
+        start_time_str=Cast(
+            TruncSecond('start_time', DateTimeField()), CharField()
+        ),
+        end_time_str=Cast(
+            TruncSecond('end_time', DateTimeField()), CharField()
+        ),
+        is_pass_str=Case(When(is_pass=True, then=Value("Passed")), default=Value("Failed"), output_field=CharField()),
+        is_completed_str=Case(When(is_completed=True, then=Value("Completed")), default=Value("Incomplete"),
+                              output_field=CharField()),
+        submodule=F('scenario__scenario_title'),
+        module_name=F('scenario__module__module_name')
+    ).values('time_spend', 'result_str', 'is_pass_str', 'is_completed_str', 'start_time_str', 'end_time_str',
+             'is_pass', 'is_completed', 'submodule', 'module_name').order_by('-date_created')
+
+    return Response(status=200, data={'data': list(user_results), 'message': 'Get all results successfully'})
 
 
 @api_view(['GET'])
